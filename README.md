@@ -122,7 +122,7 @@ nothing on the status line path touches the network. Turn it off with
 | Agent | What you get |
 |---|---|
 | Claude Code | Full: live status line, hatch, quips |
-| Codex CLI | Hooks are wired and now stay silent on purpose - see below. Use the shell snippet for the pet itself |
+| Codex CLI | Hooks work, but Codex must trust them first - see below. No status line there, so use the shell snippet for the pet |
 | tmux or your shell prompt | Full pet, works with **any** agent |
 | Editors | `pets render --format=json` to build your own |
 
@@ -132,13 +132,16 @@ Amp, Gemini CLI, or anything else. `pets install` prints the snippets.
 Claude Code is the only agent this has been verified against end to end. If you
 run something else and it works, or does not, please open an issue.
 
-**Why the Codex hooks print nothing.** A Codex user reported that Codex reads a hook's
-response and that a malformed one can stop the turn before it starts, while still exiting
-zero - so it looks like a hang rather than an error. Claude Code simply displays whatever a
-hook prints, so the same output is safe there and risky here. Until that response format is
-confirmed, `pets install --harness=codex` wires the hooks with `--harness=codex` and they
-write nothing at all. They still record everything, so `pets den` and `pets party` fill up
-normally; you just do not get the hatch card or the quip.
+**Codex hooks have to be trusted before they run.** This is the thing to know, and nothing
+tells you: Codex will not execute a new or changed hook until you accept it, an untrusted hook
+is completely silent, and `codex doctor` does not mention hooks at all. So a fresh
+`pets install --harness=codex` looks like it worked and does nothing until you say yes on the
+next session start. Verified on Codex 0.149.0 - the same config fires only when run with
+`--dangerously-bypass-hook-trust`.
+
+Once trusted it works: Codex's payloads carry `session_id`, which is what a creature is keyed
+on, so agents register and `pets den` and `pets party` fill up as they do under Claude Code.
+There is no `workspace` object in a Codex payload, so the den name comes from git instead.
 
 ## Reading it
 

@@ -48,6 +48,19 @@ func installCommand(action string, args []string) {
 		return
 	}
 
+	// Codex will not run a new or changed hook until it has been trusted, and nothing
+	// anywhere says so -- an untrusted hook is silent, and `codex doctor` does not mention
+	// hooks at all. Verified on 0.149.0: identical config fires only with
+	// --dangerously-bypass-hook-trust.
+	for _, target := range targets {
+		if target != harness.Codex {
+			continue
+		}
+		fmt.Println("\nCodex will not run these until it trusts them. It asks on the next")
+		fmt.Println("session start after a hook changes. Until you accept, they do nothing")
+		fmt.Println("and nothing tells you so.")
+	}
+
 	// The snippets are configuration, and ending on them leaves somebody with
 	// nothing to try. One creature in one repo is also not the point, so send
 	// them to a second worktree, which is where this stops looking like a
