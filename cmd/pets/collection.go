@@ -113,7 +113,7 @@ func hatchMarker(cacheDir, key string) string {
 }
 
 // hatchCommand runs on SessionStart. It is the only animated moment in the tool.
-func hatchCommand() {
+func hatchCommand(args []string) {
 	settings := config.Load()
 	payload := readPayload()
 	repo, found := gitrepo.Locate(payload.directory())
@@ -144,6 +144,9 @@ func hatchCommand() {
 	// checkout -b loop farms the collection.
 	recordIfEarned(repo, settings, cacheDir)
 
+	if speechless(args) {
+		return
+	}
 	pet := identity.For(repo.Branch)
 	collection := den.Load(cacheDir)
 	fmt.Print(render.Hatch(pet, collection.Distinct(), len(identity.All()), collection.Has(pet)))

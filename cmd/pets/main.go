@@ -70,11 +70,11 @@ func dispatch(args []string) int {
 	case "probe":
 		probeCommand(args[1:])
 	case "hatch":
-		hatchCommand()
+		hatchCommand(args[1:])
 	case "record":
 		recordCommand()
 	case "quip":
-		quipCommand()
+		quipCommand(args[1:])
 	case "install", "uninstall":
 		installCommand(args[0], args[1:])
 	case "version", "--version", "-v":
@@ -278,6 +278,12 @@ func refreshInBackground(root string) {
 	}
 }
 
+// speechless reports a harness whose hook stdout we should not write to. Codex parses a
+// hook's response and a malformed one can silently stop the turn; Claude Code just shows it.
+func speechless(args []string) bool {
+	return flagValue(args, "harness", "") == "codex"
+}
+
 func flagValue(args []string, name, fallback string) string {
 	for _, arg := range args {
 		if value, found := stringsCutPrefix(arg, "--"+name+"="); found {
@@ -459,7 +465,7 @@ func responseText(raw json.RawMessage) string {
 	return string(raw)
 }
 
-func quipCommand() {
+func quipCommand(args []string) {
 	settings := config.Load()
 	payload := readPayload()
 	repo, found := gitrepo.Locate(payload.directory())
@@ -471,6 +477,9 @@ func quipCommand() {
 	probe(repo.Root, settings)
 	view, ok := build(repo.Root, payload.agent(), settings)
 	if !ok {
+		return
+	}
+	if speechless(args) {
 		return
 	}
 	message := fmt.Sprintf("%s %s: %s", view.Body(), view.Pet.Name, quipFor(view))
