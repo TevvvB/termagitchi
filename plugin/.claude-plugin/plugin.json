@@ -1,6 +1,6 @@
 {
   "name": "pets",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A creature for every agent session, in a den for every git worktree. Its mood tracks how tidy that worktree is, so several agents at once stay tellable apart at a glance.",
   "author": {
     "name": "TevvvB",
