@@ -122,7 +122,7 @@ nothing on the status line path touches the network. Turn it off with
 | Agent | What you get |
 |---|---|
 | Claude Code | Full: live status line, hatch, quips |
-| Codex CLI | Hooks are written, but untested against a real Codex. Use the shell snippet below for the pet itself |
+| Codex CLI | Hooks are wired and now stay silent on purpose - see below. Use the shell snippet for the pet itself |
 | tmux or your shell prompt | Full pet, works with **any** agent |
 | Editors | `pets render --format=json` to build your own |
 
@@ -131,6 +131,14 @@ Amp, Gemini CLI, or anything else. `pets install` prints the snippets.
 
 Claude Code is the only agent this has been verified against end to end. If you
 run something else and it works, or does not, please open an issue.
+
+**Why the Codex hooks print nothing.** A Codex user reported that Codex reads a hook's
+response and that a malformed one can stop the turn before it starts, while still exiting
+zero - so it looks like a hang rather than an error. Claude Code simply displays whatever a
+hook prints, so the same output is safe there and risky here. Until that response format is
+confirmed, `pets install --harness=codex` wires the hooks with `--harness=codex` and they
+write nothing at all. They still record everything, so `pets den` and `pets party` fill up
+normally; you just do not get the hatch card or the quip.
 
 ## Reading it
 

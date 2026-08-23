@@ -187,8 +187,8 @@ func InstallCodex(binary string, remove bool) error {
 		setHook(settings, "SessionStart", "", "")
 	} else {
 		setHook(settings, "PostToolUse", binary+" record", "Bash")
-		setHook(settings, "Stop", binary+" quip", "")
-		setHook(settings, "SessionStart", binary+" hatch", "")
+		setHook(settings, "Stop", binary+" quip --harness=codex", "")
+		setHook(settings, "SessionStart", binary+" hatch --harness=codex", "")
 	}
 	return saveJSON(path, settings)
 }
