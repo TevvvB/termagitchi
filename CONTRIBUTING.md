@@ -60,6 +60,11 @@ is batched into a release and called out in the notes, rather than merged one
 cute animal at a time. If you have a creature you like, open it anyway and say
 so - it may just wait for company.
 
+Whether that stays the policy is [an open
+question](https://github.com/TevvvB/parallel-harness-pets/discussions/46), and
+the answer partly depends on how many creatures are waiting. Post yours there
+too.
+
 ## Adding a signal
 
 A signal is any executable that prints `key=value` lines on stdout. It receives
