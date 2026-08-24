@@ -1,7 +1,9 @@
 // Package identity derives a creature from one opaque key.
 //
 // Nothing here touches disk or network: the same key yields the same creature on
-// every machine, forever, with nothing persisted. Rarity is a weighted band over
+// every machine, with nothing persisted. That holds for as long as the roster
+// does - a creature is drawn with pool[hash%len], so growing a band reassigns
+// every key already in it, which CONTRIBUTING.md covers as a release-sized event. Rarity is a weighted band over
 // the same hash, so a collection costs no extra state.
 //
 // Callers decide what the key means, and they deliberately disagree. Live
