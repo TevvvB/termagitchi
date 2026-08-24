@@ -1,0 +1,9 @@
+{
+  "cwd": "/home/user/code/demo/.worktrees/feat-example",
+  "hook_event_name": "SessionStart",
+  "model": "gpt-5.6-sol",
+  "permission_mode": "bypassPermissions",
+  "session_id": "00000000-0000-0000-0000-000000000000",
+  "source": "startup",
+  "transcript_path": "/home/user/.codex/sessions/2026/08/23/rollout-2026-08-23T13-22-47-00000000-0000-0000-0000-000000000000.jsonl"
+}
