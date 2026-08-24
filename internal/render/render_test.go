@@ -280,9 +280,18 @@ func TestHookMessageCarriesScoreAndCounts(t *testing.T) {
 	}
 	message := HookMessage(view, config.Default(), "this branch only exists on your laptop.")
 
-	for _, want := range []string{"@ " + view.Place.Code, "♥♡♡♡♡", "31△", "27↑", "250↓", view.Pet.Name} {
-		if !strings.Contains(message, want) {
-			t.Errorf("hook message %q is missing %q", message, want)
+	// Three rows: Codex puts the first after its own prefix and indents the rest, so the
+	// split is what makes this read as a block rather than one trailing sentence.
+	rows := strings.Split(message, "\n")
+	if len(rows) != 3 {
+		t.Fatalf("want 3 rows, got %d: %q", len(rows), message)
+	}
+	if !strings.Contains(rows[0], view.Pet.Name) || !strings.Contains(rows[0], "@ "+view.Place.Code) {
+		t.Errorf("first row should say who and where, got %q", rows[0])
+	}
+	for _, want := range []string{"♥♡♡♡♡", "31△", "27↑", "250↓"} {
+		if !strings.Contains(rows[1], want) {
+			t.Errorf("state row %q is missing %q", rows[1], want)
 		}
 	}
 	// A host that prints this as body text may not survive raw escapes, and we cannot
