@@ -91,23 +91,36 @@ func (v View) heartGlyphs() (filled, empty string) {
 
 // HookMessage is the whole readout for a surface that gets one line and no status bar.
 //
-// Deliberately monochrome: a host like Codex prints this as body text among its own
-// output, and raw ANSI is not guaranteed to survive or to suit its palette. Without the
-// glyphs the line was just a creature and one sentence, which lost the place, the score
-// and two of the three counts the status line would have shown. The place matters most of
-// the three: it is the only part that says which worktree is talking.
+// Three rows, because Codex splits systemMessage on newlines and indents every row after
+// the first by four spaces, uncapped: only its separate hook-context path truncates at
+// three. So identity, state and voice each get their own row and the thing reads as a
+// block instead of one long sentence trailing off the prefix.
+//
+// Deliberately monochrome: the host prints this as body text, raw ANSI is not guaranteed
+// to survive, and its palette is unknowable from here.
 func HookMessage(v View, settings config.Config, quip string) string {
-	parts := []string{v.Body(), v.Pet.Name}
+	who := []string{v.Body(), v.Pet.Name}
 	if home := v.Home(); home != "" {
-		parts = append(parts, home)
+		who = append(who, home)
 	}
-	if filled, empty := v.heartGlyphs(); v.HasState {
-		parts = append(parts, filled+empty)
+	rows := []string{strings.Join(who, " ")}
+	if state := v.stateRow(settings); state != "" {
+		rows = append(rows, state)
 	}
-	if flags := v.Flags(settings); v.HasState && len(flags) > 0 {
-		parts = append(parts, strings.Join(flags, " "))
+	return strings.Join(append(rows, quip), "\n")
+}
+
+// stateRow is the score and counts a status line would show, without colour.
+func (v View) stateRow(settings config.Config) string {
+	if !v.HasState {
+		return ""
 	}
-	return strings.Join(parts, " ") + " · " + quip
+	filled, empty := v.heartGlyphs()
+	row := filled + empty
+	if flags := v.Flags(settings); len(flags) > 0 {
+		row += "  " + strings.Join(flags, " ")
+	}
+	return row
 }
 
 // Flags are the raw counts behind the mood, shown only when they are non-zero.
