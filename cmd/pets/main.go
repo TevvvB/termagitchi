@@ -473,7 +473,7 @@ func quipCommand() {
 	if !ok {
 		return
 	}
-	message := fmt.Sprintf("%s %s: %s", view.Body(), view.Pet.Name, quipFor(view))
+	message := render.HookMessage(view, settings, quipFor(view))
 	encoded, err := json.Marshal(map[string]string{"systemMessage": message})
 	if err != nil {
 		return
