@@ -273,13 +273,14 @@ func TestPartyDoesNotRepeatTheCreatureOfALoneResident(t *testing.T) {
 func TestHookMessageCarriesScoreAndCounts(t *testing.T) {
 	view := View{
 		Pet:      identity.For("main"),
+		Place:    identity.PlaceForKey("place:demo#demo"),
 		HasState: true,
 		Score:    score.Result{Hearts: 1},
 		State:    state.State{Dirty: 31, Unpushed: 27, Behind: 250},
 	}
 	message := HookMessage(view, config.Default(), "this branch only exists on your laptop.")
 
-	for _, want := range []string{"♥♡♡♡♡", "31△", "27↑", "250↓", view.Pet.Name} {
+	for _, want := range []string{"@ " + view.Place.Code, "♥♡♡♡♡", "31△", "27↑", "250↓", view.Pet.Name} {
 		if !strings.Contains(message, want) {
 			t.Errorf("hook message %q is missing %q", message, want)
 		}
