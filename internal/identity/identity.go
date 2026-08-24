@@ -1,8 +1,13 @@
-// Package identity derives a worktree's creature from its branch name alone.
+// Package identity derives a creature from one opaque key.
 //
-// Nothing here touches disk or network: the same branch yields the same creature
-// on every machine, forever, with nothing persisted. Rarity is a weighted band
-// over the same hash, so a collection costs no extra state.
+// Nothing here touches disk or network: the same key yields the same creature on
+// every machine, forever, with nothing persisted. Rarity is a weighted band over
+// the same hash, so a collection costs no extra state.
+//
+// Callers decide what the key means, and they deliberately disagree. Live
+// surfaces pass a session id, so every agent gets its own creature. The den
+// passes a branch, so a creature is earned once per branch however many agents
+// pass through it.
 package identity
 
 import "fmt"
@@ -36,7 +41,7 @@ func (r Rarity) Stars() string {
 }
 
 // weights are per ten-thousand so the table stays exact in integer maths.
-// Tuned so a legendary lands roughly one branch in thirty.
+// Tuned so a legendary lands roughly one key in thirty.
 var weights = [...]int{6000, 2500, 1100, 350, 50}
 
 // Species is one creature: a name, its band, and the frame fragments bracketing its face.
@@ -106,7 +111,7 @@ var byRarity = func() map[Rarity][]Species {
 }()
 
 // Common and uncommon creatures take a hue hashed independently of species, so
-// two live branches on the same creature still read apart. The colours reserved
+// two live agents on the same creature still read apart. The colours reserved
 // for the higher bands are deliberately absent here, so an ordinary creature can
 // never be mistaken for a rare one.
 var palette = []int{173, 208, 114, 203, 187, 218, 79, 179, 156}
@@ -169,24 +174,24 @@ func bandFor(roll int) Rarity {
 	return Common
 }
 
-// For returns the creature belonging to a branch.
+// For returns the creature belonging to a key: a session id, a branch, anything stable.
 //
 // The band is chosen first so rarity stays on its intended distribution no
 // matter how many creatures a pack adds to any one band.
-func For(branch string) Pet {
-	band := bandFor(Hash("band:" + branch))
+func For(key string) Pet {
+	band := bandFor(Hash("band:" + key))
 	pool := byRarity[band]
 	if len(pool) == 0 {
 		pool = byRarity[Common]
 	}
 	color, reserved := bandColor[band]
 	if !reserved {
-		color = palette[Hash("hue:"+branch)%len(palette)]
+		color = palette[Hash("hue:"+key)%len(palette)]
 	}
 	return Pet{
-		Species: pool[Hash(branch)%len(pool)],
+		Species: pool[Hash(key)%len(pool)],
 		Color:   color,
-		Shiny:   Hash("shiny:"+branch)%shinyOdds == 0,
+		Shiny:   Hash("shiny:"+key)%shinyOdds == 0,
 	}
 }
 
