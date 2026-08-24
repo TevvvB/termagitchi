@@ -266,3 +266,27 @@ func TestPartyDoesNotRepeatTheCreatureOfALoneResident(t *testing.T) {
 		}
 	}
 }
+
+// The Codex Stop hook gets one line and no status bar, and it used to carry only the
+// creature and a sentence: the score and two of the three counts were simply absent, so
+// the readout barely registered among the host's own output.
+func TestHookMessageCarriesScoreAndCounts(t *testing.T) {
+	view := View{
+		Pet:      identity.For("main"),
+		HasState: true,
+		Score:    score.Result{Hearts: 1},
+		State:    state.State{Dirty: 31, Unpushed: 27, Behind: 250},
+	}
+	message := HookMessage(view, config.Default(), "this branch only exists on your laptop.")
+
+	for _, want := range []string{"♥♡♡♡♡", "31△", "27↑", "250↓", view.Pet.Name} {
+		if !strings.Contains(message, want) {
+			t.Errorf("hook message %q is missing %q", message, want)
+		}
+	}
+	// A host that prints this as body text may not survive raw escapes, and we cannot
+	// know its palette either way.
+	if strings.Contains(message, "\033") {
+		t.Errorf("hook message carries ANSI: %q", message)
+	}
+}

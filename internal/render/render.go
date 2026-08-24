@@ -74,12 +74,36 @@ func (v View) Body() string {
 }
 
 func (v View) hearts() string {
+	filled, empty := v.heartGlyphs()
 	if !v.HasState {
-		return dim + "·····" + reset
+		return dim + empty + reset
 	}
-	filled := strings.Repeat("♥", v.Score.Hearts)
-	empty := strings.Repeat("♡", score.Max-v.Score.Hearts)
 	return heartHue + filled + dim + empty + reset
+}
+
+// heartGlyphs splits the bar so a surface that cannot take ANSI still shows the score.
+func (v View) heartGlyphs() (filled, empty string) {
+	if !v.HasState {
+		return "", "·····"
+	}
+	return strings.Repeat("♥", v.Score.Hearts), strings.Repeat("♡", score.Max-v.Score.Hearts)
+}
+
+// HookMessage is the whole readout for a surface that gets one line and no status bar.
+//
+// Deliberately monochrome: a host like Codex prints this as body text among its own
+// output, and raw ANSI is not guaranteed to survive or to suit its palette. Without the
+// glyphs the line was just a creature and one sentence, which lost the score and two of
+// the three counts the status line would have shown.
+func HookMessage(v View, settings config.Config, quip string) string {
+	parts := []string{v.Body(), v.Pet.Name}
+	if filled, empty := v.heartGlyphs(); v.HasState {
+		parts = append(parts, filled+empty)
+	}
+	if flags := v.Flags(settings); v.HasState && len(flags) > 0 {
+		parts = append(parts, strings.Join(flags, " "))
+	}
+	return strings.Join(parts, " ") + " · " + quip
 }
 
 // Flags are the raw counts behind the mood, shown only when they are non-zero.
