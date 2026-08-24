@@ -10,7 +10,7 @@ import (
 // wearing their band. This table exists so neither changes again by accident.
 func TestForIsPinned(t *testing.T) {
 	cases := []struct {
-		branch  string
+		key     string
 		species string
 		color   int
 		rarity  Rarity
@@ -32,11 +32,11 @@ func TestForIsPinned(t *testing.T) {
 	}
 
 	for _, testCase := range cases {
-		pet := For(testCase.branch)
+		pet := For(testCase.key)
 		if pet.Name != testCase.species || pet.Color != testCase.color ||
 			pet.Rarity != testCase.rarity || pet.Shiny != testCase.shiny {
 			t.Errorf("For(%q) = %s/%d/%s/shiny=%v, want %s/%d/%s/shiny=%v",
-				testCase.branch, pet.Name, pet.Color, pet.Rarity, pet.Shiny,
+				testCase.key, pet.Name, pet.Color, pet.Rarity, pet.Shiny,
 				testCase.species, testCase.color, testCase.rarity, testCase.shiny)
 		}
 	}
@@ -150,7 +150,7 @@ func TestHashIsStable(t *testing.T) {
 
 // Rarity has to be visible without decoding a star count, so anything rare or
 // above wears its band's colour. Commons and uncommons keep an independent hue,
-// which is what stops two live branches on the same creature reading alike.
+// which is what stops two live agents on the same creature reading alike.
 func TestRareCreaturesWearTheirBand(t *testing.T) {
 	bands := map[Rarity]int{}
 	ordinary := map[int]bool{}
@@ -171,6 +171,6 @@ func TestRareCreaturesWearTheirBand(t *testing.T) {
 		}
 	}
 	if len(ordinary) < 5 {
-		t.Errorf("only %d hues left for common and uncommon, too few to tell branches apart", len(ordinary))
+		t.Errorf("only %d hues left for common and uncommon, too few to tell agents apart", len(ordinary))
 	}
 }
