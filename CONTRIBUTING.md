@@ -28,6 +28,38 @@ one rarer to draw.
 Please check your creature reads at a glance in a terminal, not just in a diff.
 Faces range from `•ᴗ•` down to `x_x`, so try it at both ends.
 
+### The line is small and the blast radius is not
+
+Read this before opening the PR, because the diff looks free and is not.
+
+A creature is picked with `pool[Hash(key) % len(pool)]`, so **growing a band
+changes which creature every existing key in that band draws.** Adding one
+Common is enough. Measured, from adding a single new Common:
+
+```
+For("main")   mouse -> toad
+For("master") vole  -> toad
+For("trunk")  wren  -> moth
+For("a")      crab  -> carp
+```
+
+Three consequences, in rising order of how much they matter:
+
+1. Two tests fail, in two packages: the golden pin in `internal/identity` and a
+   party test in `internal/render`. That is the pin doing its job, not a mistake
+   you made. Repin it in the same PR.
+2. Everyone's pet changes when they upgrade. The mouse someone has had in `main`
+   for a month becomes a toad.
+3. `den.json` keeps the **old** species names, and it is the only precious state
+   here. So `collection.Has()` stops matching what is on screen: the den quietly
+   re-earns creatures it already holds, and the entries it held before become
+   unreachable, because no key summons them any more.
+
+None of that is a reason never to add creatures. It is the reason roster growth
+is batched into a release and called out in the notes, rather than merged one
+cute animal at a time. If you have a creature you like, open it anyway and say
+so - it may just wait for company.
+
 ## Adding a signal
 
 A signal is any executable that prints `key=value` lines on stdout. It receives
@@ -83,10 +115,12 @@ the collection. Nothing else on disk is touched.
 
 Two things worth knowing before changing them:
 
-**Identity must stay stable.** A branch is supposed to summon the same creature
-forever, on any machine. `internal/identity` has a golden test pinning specific
-branch names to specific creatures, and it is there to make an accidental
-reshuffle loud. If you change identity deliberately, repin it and say so.
+**Identity must stay stable.** A key is supposed to summon the same creature on
+any machine, for as long as the roster holds still. `internal/identity` has a
+golden test pinning specific keys to specific creatures, and it is there to make
+an accidental reshuffle loud. If you change identity deliberately, repin it and
+say so. Adding a creature is one of the ways to change it: see [the blast radius
+above](#the-line-is-small-and-the-blast-radius-is-not).
 
 **The render path never runs git and never touches the network.** `pets render`
 executes once a second in every open session, so it reads two small files and
