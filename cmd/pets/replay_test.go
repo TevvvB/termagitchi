@@ -10,6 +10,7 @@ import (
 
 	"github.com/TevvvB/parallel-harness-pets/internal/agents"
 	"github.com/TevvvB/parallel-harness-pets/internal/gitrepo"
+	"github.com/TevvvB/parallel-harness-pets/internal/identity"
 	"github.com/TevvvB/parallel-harness-pets/internal/state"
 )
 
@@ -135,5 +136,47 @@ func TestRecordFromRegistersTheAgentEvenWhenTheCommandIsNotATestRun(t *testing.T
 	}
 	if live[0].Den == "" {
 		t.Error("agent registered with no den, so no listing can group it")
+	}
+}
+
+// Codex is the reason parsePayload must not treat a decode error as fatal.
+//
+// Its payload sends model as a plain string where Claude Code sends an object,
+// so unmarshalling it always returns an UnmarshalTypeError. Go fills in every
+// other field regardless, which is the only reason Codex works at all. Add the
+// error check that line looks like it is missing and every Codex hook stops
+// registering agents, with the whole Claude Code suite still green.
+//
+// Codex also sends no workspace object, so the den has to come from git. A
+// registerAgent that trusted the payload's worktree would put every checkout
+// in one shared den, and again only Codex would notice.
+func TestCapturedCodexPayloadRegistersIntoTheGitDerivedDen(t *testing.T) {
+	root := worktree(t, "feat-example")
+	cache := t.TempDir()
+	now := time.Now()
+
+	payload := parsePayload(strings.NewReader(fixture(t, "codex-sessionstart.json", root)), time.Second)
+	if payload.SessionID == "" {
+		t.Fatal("no session_id survived the decode: every Codex hook is anonymous")
+	}
+	if payload.Workspace.GitWorktree != "" {
+		t.Fatal("fixture has a workspace object, so it no longer exercises the git fallback")
+	}
+
+	located, found := gitrepo.Locate(root)
+	if !found {
+		t.Fatalf("could not locate the worktree at %s", root)
+	}
+	den := registerAgent(cache, located, payload.agent(), now)
+	if want := identity.DenKey(located.Project(), located.Worktree()); den != want {
+		t.Errorf("den %q, want the git-derived %q", den, want)
+	}
+
+	residents := agents.InDen(cache, den, now)
+	if len(residents) != 1 {
+		t.Fatalf("den holds %d agents after one Codex hook, want 1", len(residents))
+	}
+	if residents[0].Session != payload.SessionID {
+		t.Errorf("den holds session %q, want %q", residents[0].Session, payload.SessionID)
 	}
 }
