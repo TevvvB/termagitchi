@@ -93,10 +93,14 @@ func (v View) heartGlyphs() (filled, empty string) {
 //
 // Deliberately monochrome: a host like Codex prints this as body text among its own
 // output, and raw ANSI is not guaranteed to survive or to suit its palette. Without the
-// glyphs the line was just a creature and one sentence, which lost the score and two of
-// the three counts the status line would have shown.
+// glyphs the line was just a creature and one sentence, which lost the place, the score
+// and two of the three counts the status line would have shown. The place matters most of
+// the three: it is the only part that says which worktree is talking.
 func HookMessage(v View, settings config.Config, quip string) string {
 	parts := []string{v.Body(), v.Pet.Name}
+	if home := v.Home(); home != "" {
+		parts = append(parts, home)
+	}
 	if filled, empty := v.heartGlyphs(); v.HasState {
 		parts = append(parts, filled+empty)
 	}
