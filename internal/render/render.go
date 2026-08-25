@@ -91,10 +91,10 @@ func (v View) heartGlyphs() (filled, empty string) {
 
 // HookMessage is the whole readout for a surface that gets one line and no status bar.
 //
-// Three rows, because Codex splits systemMessage on newlines and indents every row after
-// the first by four spaces, uncapped: only its separate hook-context path truncates at
-// three. So identity, state and voice each get their own row and the thing reads as a
-// block instead of one long sentence trailing off the prefix.
+// Codex splits systemMessage on newlines, renders the first row inline after its own
+// "says:" prefix, and indents every later row by four spaces, uncapped: only its separate
+// hook-context path truncates at three. The first row is left empty so the creature,
+// the state and the voice all land in the indented block and line up with each other.
 //
 // Deliberately monochrome: the host prints this as body text, raw ANSI is not guaranteed
 // to survive, and its palette is unknowable from here.
@@ -103,7 +103,9 @@ func HookMessage(v View, settings config.Config, quip string) string {
 	if home := v.Home(); home != "" {
 		who = append(who, home)
 	}
-	rows := []string{strings.Join(who, " ")}
+	// Leading blank so the creature gets its own row: Codex renders the first row inline
+	// after its "says:" prefix, and only later rows land on the indented block.
+	rows := []string{"", strings.Join(who, " ")}
 	if state := v.stateRow(settings); state != "" {
 		rows = append(rows, state)
 	}
