@@ -280,18 +280,22 @@ func TestHookMessageCarriesScoreAndCounts(t *testing.T) {
 	}
 	message := HookMessage(view, config.Default(), "this branch only exists on your laptop.")
 
-	// Three rows: Codex puts the first after its own prefix and indents the rest, so the
-	// split is what makes this read as a block rather than one trailing sentence.
+	// Codex puts the first row inline after its own prefix and indents the rest, so the
+	// leading empty row is what gets the creature onto a line of its own with the state
+	// and the quip lined up under it.
 	rows := strings.Split(message, "\n")
-	if len(rows) != 3 {
-		t.Fatalf("want 3 rows, got %d: %q", len(rows), message)
+	if len(rows) != 4 {
+		t.Fatalf("want 4 rows, got %d: %q", len(rows), message)
 	}
-	if !strings.Contains(rows[0], view.Pet.Name) || !strings.Contains(rows[0], "@ "+view.Place.Code) {
-		t.Errorf("first row should say who and where, got %q", rows[0])
+	if rows[0] != "" {
+		t.Errorf("first row must be empty or the creature shares Codex's prefix row, got %q", rows[0])
+	}
+	if !strings.Contains(rows[1], view.Pet.Name) || !strings.Contains(rows[1], "@ "+view.Place.Code) {
+		t.Errorf("creature row should say who and where, got %q", rows[1])
 	}
 	for _, want := range []string{"♥♡♡♡♡", "31△", "27↑", "250↓"} {
-		if !strings.Contains(rows[1], want) {
-			t.Errorf("state row %q is missing %q", rows[1], want)
+		if !strings.Contains(rows[2], want) {
+			t.Errorf("state row %q is missing %q", rows[2], want)
 		}
 	}
 	// A host that prints this as body text may not survive raw escapes, and we cannot
