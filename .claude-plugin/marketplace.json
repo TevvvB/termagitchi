@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "A creature for every agent session, living in your status line",
-    "version": "0.2.8"
+    "version": "0.2.9"
   },
   "plugins": [
     {
       "name": "pets",
       "source": "./plugin",
       "description": "The /pets skill plus a one-command setup. Gives every agent session its own creature in the status line, with a den per git worktree, rarity bands and 16 cities to collect.",
-      "version": "0.2.8",
+      "version": "0.2.9",
       "category": "fun",
       "keywords": [
         "statusline",
