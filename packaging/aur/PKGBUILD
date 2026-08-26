@@ -1,14 +1,14 @@
 # Maintainer: TevvvB <45053368+TevvvB@users.noreply.github.com>
-pkgname=parallel-harness-pets-bin
-_pkgname=parallel-harness-pets
+pkgname=termagitchi-bin
+_pkgname=termagitchi
 pkgver=0.2.3
 pkgrel=1
 pkgdesc="A creature for every coding agent, in a den for every git worktree"
 arch=('x86_64' 'aarch64')
-url="https://github.com/TevvvB/parallel-harness-pets"
+url="https://github.com/TevvvB/termagitchi"
 license=('MIT')
-provides=('parallel-harness-pets' 'pets')
-conflicts=('parallel-harness-pets' 'pets')
+provides=('termagitchi' 'pets')
+conflicts=('termagitchi' 'pets')
 options=('!strip')
 
 source_x86_64=("${_pkgname}_${pkgver}_linux_amd64.tar.gz::${url}/releases/download/v${pkgver}/${_pkgname}_${pkgver}_linux_amd64.tar.gz")

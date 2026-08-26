@@ -61,7 +61,7 @@ cute animal at a time. If you have a creature you like, open it anyway and say
 so - it may just wait for company.
 
 Whether that stays the policy is [an open
-question](https://github.com/TevvvB/parallel-harness-pets/discussions/46), and
+question](https://github.com/TevvvB/termagitchi/discussions/46), and
 the answer partly depends on how many creatures are waiting. Post yours there
 too.
 

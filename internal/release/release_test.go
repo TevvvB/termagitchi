@@ -100,12 +100,12 @@ func TestReadCacheOnGarbage(t *testing.T) {
 }
 
 func TestCommandMatchesTheInstall(t *testing.T) {
-	brew := "/opt/homebrew/Caskroom/parallel-harness-pets/0.1.1/pets"
-	if got := Command(brew); got != "brew upgrade parallel-harness-pets" {
+	brew := "/opt/homebrew/Caskroom/termagitchi/0.1.1/pets"
+	if got := Command(brew); got != "brew upgrade termagitchi" {
 		t.Errorf("Command(%q) = %q", brew, got)
 	}
 	manual := "/home/someone/.local/bin/pets"
-	if got := Command(manual); got == "brew upgrade parallel-harness-pets" {
+	if got := Command(manual); got == "brew upgrade termagitchi" {
 		t.Errorf("Command(%q) suggested brew for a manual install", manual)
 	}
 }

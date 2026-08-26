@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/header.png" alt="parallel-harness-pets" width="100%" />
+  <img src="docs/header.png" alt="termagitchi" width="100%" />
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@
 
 <div align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-5fd7af?style=flat" alt="MIT"></a>
-  <a href="https://github.com/TevvvB/parallel-harness-pets/releases"><img src="https://img.shields.io/github/v/release/TevvvB/parallel-harness-pets?style=flat&color=5fd7ff" alt="Release"></a>
+  <a href="https://github.com/TevvvB/termagitchi/releases"><img src="https://img.shields.io/github/v/release/TevvvB/termagitchi?style=flat&color=5fd7ff" alt="Release"></a>
   <a href="https://buymeacoffee.com/tevvvb"><img src="https://img.shields.io/badge/buy_me_a_coffee-ffdd00?style=flat&logo=buymeacoffee&logoColor=black" alt="Buy me a coffee"></a>
   <p><sub><i>If you like, I like coffee :)</i></sub></p>
 </div>
@@ -45,14 +45,14 @@
 **Linux and macOS**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TevvvB/parallel-harness-pets/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/TevvvB/termagitchi/main/install.sh | sh
 pets install
 ```
 
 **macOS with Homebrew**
 
 ```sh
-brew install TevvvB/tap/parallel-harness-pets
+brew install TevvvB/tap/termagitchi
 pets install
 ```
 
@@ -60,8 +60,8 @@ pets install
 from inside Claude Code:
 
 ```
-/plugin marketplace add TevvvB/parallel-harness-pets
-/plugin install pets@parallel-harness-pets
+/plugin marketplace add TevvvB/termagitchi
+/plugin install pets@termagitchi
 /pets-setup
 ```
 
@@ -70,10 +70,10 @@ hooks, which is what `/pets-setup` runs. You need the binary either way - a plug
 carries configuration, not executables. See [plugin/README.md](plugin/README.md).
 
 **Windows** - grab an archive from
-[Releases](https://github.com/TevvvB/parallel-harness-pets/releases), put `pets`
+[Releases](https://github.com/TevvvB/termagitchi/releases), put `pets`
 on your `PATH`, then run `pets install`.
 
-**With Go** - `go install github.com/TevvvB/parallel-harness-pets/cmd/pets@latest`
+**With Go** - `go install github.com/TevvvB/termagitchi/cmd/pets@latest`
 
 `pets install` finds the agents you have and wires itself in, backing up any
 config it touches and leaving your other settings alone. Start a new session
@@ -82,7 +82,7 @@ afterwards. `pets uninstall` reverses it.
 If an agent is installed but has never been run, it has no config directory yet,
 so name it directly: `pets install --harness=claude`.
 
-## Star parallel-harness-pets
+## Star termagitchi
 
 If a creature in your status line makes running several agents at once a little
 easier to keep straight, a star helps other people find it.
@@ -95,9 +95,9 @@ easier to keep straight, a star helps other people find it.
 
 | Installed with | Update with |
 |---|---|
-| Homebrew | `brew update && brew upgrade parallel-harness-pets` |
+| Homebrew | `brew update && brew upgrade termagitchi` |
 | The install script | re-run it, it replaces the binary in place |
-| Go | `go install github.com/TevvvB/parallel-harness-pets/cmd/pets@latest` |
+| Go | `go install github.com/TevvvB/termagitchi/cmd/pets@latest` |
 | A release archive | download the new one |
 
 `brew update` first is not optional. Without it Homebrew reads its cached copy of the

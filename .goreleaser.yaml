@@ -1,5 +1,7 @@
 version: 2
 
+project_name: termagitchi
+
 before:
   hooks:
     - go mod tidy
@@ -39,12 +41,12 @@ changelog:
 # skipped, so a tag still produces working GitHub Release binaries rather than
 # failing the whole release on a missing repo.
 homebrew_casks:
-  - name: parallel-harness-pets
+  - name: termagitchi
     skip_upload: "true"
     repository:
       owner: TevvvB
       name: homebrew-tap
-    homepage: https://github.com/TevvvB/parallel-harness-pets
+    homepage: https://github.com/TevvvB/termagitchi
     description: A creature for every worktree, in your agent's status line
     license: MIT
     binaries:
@@ -63,6 +65,6 @@ scoops:
     repository:
       owner: TevvvB
       name: scoop-bucket
-    homepage: https://github.com/TevvvB/parallel-harness-pets
+    homepage: https://github.com/TevvvB/termagitchi
     description: A creature for every worktree, in your agent's status line
     license: MIT

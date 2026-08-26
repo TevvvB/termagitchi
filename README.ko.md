@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/header.png" alt="parallel-harness-pets" width="100%" />
+  <img src="docs/header.png" alt="termagitchi" width="100%" />
 </p>
 
 <p align="center">
@@ -30,21 +30,21 @@
 **Linux와 macOS**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TevvvB/parallel-harness-pets/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/TevvvB/termagitchi/main/install.sh | sh
 pets install
 ```
 
 **macOS (Homebrew)**
 
 ```sh
-brew install TevvvB/tap/parallel-harness-pets
+brew install TevvvB/tap/termagitchi
 pets install
 ```
 
-**Windows** — [Releases](https://github.com/TevvvB/parallel-harness-pets/releases)에서
+**Windows** — [Releases](https://github.com/TevvvB/termagitchi/releases)에서
 아카이브를 받아 `pets`를 `PATH`에 두고 `pets install`을 실행하세요.
 
-**Go로 설치** — `go install github.com/TevvvB/parallel-harness-pets/cmd/pets@latest`
+**Go로 설치** — `go install github.com/TevvvB/termagitchi/cmd/pets@latest`
 
 `pets install`은 설치된 에이전트를 찾아 스스로를 연결합니다. 건드린 설정은 백업하고
 나머지 설정은 그대로 둡니다. 실행한 뒤에는 새 세션을 여세요. `pets uninstall`로 되돌립니다.
@@ -148,4 +148,4 @@ MIT. [LICENSE](LICENSE)를 참고하세요.
 ---
 
 > 이 번역은 영어판을 바탕으로 한 기계 번역입니다. 어색한 표현이 있다면
-> [issue](https://github.com/TevvvB/parallel-harness-pets/issues)나 PR로 고쳐주시면 감사하겠습니다.
+> [issue](https://github.com/TevvvB/termagitchi/issues)나 PR로 고쳐주시면 감사하겠습니다.
