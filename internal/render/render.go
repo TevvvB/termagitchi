@@ -425,7 +425,7 @@ func Card(v View, settings config.Config) string {
 	}
 	row("last tests", v.Tests, penalised["tests"])
 	for name, value := range v.State.External {
-		row(name, fmt.Sprint(value), false)
+		row(name, fmt.Sprint(value), penalised[name])
 	}
 	now := time.Now()
 	out.WriteString(Residents(v, now))

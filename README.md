@@ -260,14 +260,31 @@ penalty = 2
 ### Teaching it your stack
 
 Any executable that prints `key=value` lines is a signal. Drop it in
-`~/.config/pets/signals/` and it is scored with the built-in ones. It gets the
-worktree path as its first argument.
+`~/.config/pets/signals/`. It gets the worktree path as its first argument.
 
 ```sh
 #!/bin/sh
 # ~/.config/pets/signals/cargo.sh
 echo "clippy=$(cargo clippy --message-format=short 2>&1 | grep -c '^warning')"
+echo "coverage=$(grep -o '[0-9]*' target/coverage 2>/dev/null || echo 100)"
 ```
+
+That much shows up on `pets card`. To make it reach the pet's face, give it a rule:
+
+```toml
+[signals.external.penalties.clippy]
+over = 0      # bad when it goes up
+cost = 1
+
+[signals.external.penalties.coverage]
+under = 80    # bad when it goes down
+cost = 2
+```
+
+Two bounds, because half of what people measure is bad going up and half is bad
+going down. A signal with no rule stays display-only, and a signal that did not
+report is not treated as reporting zero, so a probe that fails to run cannot
+sadden the pet on its own.
 
 ## Contributing
 
