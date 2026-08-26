@@ -2,6 +2,8 @@
 package score
 
 import (
+	"sort"
+
 	"github.com/TevvvB/parallel-harness-pets/internal/config"
 	"github.com/TevvvB/parallel-harness-pets/internal/state"
 )
@@ -45,6 +47,15 @@ func Of(current state.State, tests string, settings config.Config) Result {
 	if settings.Signals.Migrations.Enabled {
 		charge("migrations", settings.Signals.Migrations.Penalty, current.Migrations > 1)
 	}
+	// Sorted so the card lists reasons in a stable order rather than map order.
+	for _, name := range sortedNames(settings.Signals.External.Penalties) {
+		// A signal that did not report is not a signal reading zero, so an absent
+		// coverage probe must not trip an "under 80" rule.
+		if value, reported := current.External[name]; reported {
+			charge(name, settings.Signals.External.Penalties[name].Cost,
+				settings.Signals.External.Penalties[name].Triggered(value))
+		}
+	}
 
 	if result.Hearts < 0 {
 		result.Hearts = 0
@@ -53,6 +64,15 @@ func Of(current state.State, tests string, settings config.Config) Result {
 		result.Hearts = Max
 	}
 	return result
+}
+
+func sortedNames(penalties map[string]config.ExternalPenalty) []string {
+	names := make([]string, 0, len(penalties))
+	for name := range penalties {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
 }
 
 func Face(hearts int) string {

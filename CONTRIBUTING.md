@@ -76,6 +76,11 @@ the worktree path as its first argument. Drop it in `~/.config/pets/signals/`.
 echo "clippy=$(cargo clippy --message-format=short 2>&1 | grep -c '^warning')"
 ```
 
+By default that only adds a row to `pets card`. Give it a bound and a cost under
+`[signals.external.penalties.<name>]` and it costs hearts like the built-in signals,
+and the card shows it in amber. `over` for things that are bad when they rise,
+`under` for things that are bad when they fall.
+
 Signals are user configuration rather than part of the tool, so there is nothing
 to submit unless you want one documented in the README as an example.
 

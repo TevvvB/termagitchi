@@ -41,8 +41,28 @@ type Migrations struct {
 }
 
 type External struct {
-	Dir       string `toml:"dir"`
-	TimeoutMs int    `toml:"timeout_ms"`
+	Dir       string                     `toml:"dir"`
+	TimeoutMs int                        `toml:"timeout_ms"`
+	Penalties map[string]ExternalPenalty `toml:"penalties"`
+}
+
+// ExternalPenalty makes one user signal count against the score.
+//
+// Two bounds because half of what people measure is bad going up (warnings, TODOs,
+// drifted resources) and half is bad going down (coverage, checks passing). Pointers so
+// that "over = 0", the most useful rule there is, is distinguishable from unset.
+type ExternalPenalty struct {
+	Over  *int `toml:"over"`
+	Under *int `toml:"under"`
+	Cost  int  `toml:"cost"`
+}
+
+// Triggered reports whether a reported value breaches this rule.
+func (p ExternalPenalty) Triggered(value int) bool {
+	if p.Over != nil && value > *p.Over {
+		return true
+	}
+	return p.Under != nil && value < *p.Under
 }
 
 // Update controls the once-a-day check for a newer release. It runs only from

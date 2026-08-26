@@ -80,3 +80,48 @@ func TestFaceDegradesWithHearts(t *testing.T) {
 		previous = face
 	}
 }
+
+func intPtr(value int) *int { return &value }
+
+// The whole premise is that the face reflects the worktree, and external signals were the
+// one user-extensible input that could not touch it: score never read State.External, so a
+// signal reporting 40 clippy warnings left the pet delighted.
+func TestExternalSignalsCostHearts(t *testing.T) {
+	settings := config.Default()
+	settings.Signals.External.Penalties = map[string]config.ExternalPenalty{
+		"clippy":   {Over: intPtr(0), Cost: 2},
+		"coverage": {Under: intPtr(80), Cost: 1},
+	}
+
+	clean := Of(state.State{External: map[string]int{"clippy": 0, "coverage": 95}}, "pass", settings)
+	if clean.Hearts != settings.Score.Start {
+		t.Errorf("signals within their bounds cost %d hearts", settings.Score.Start-clean.Hearts)
+	}
+
+	breached := Of(state.State{External: map[string]int{"clippy": 40, "coverage": 61}}, "pass", settings)
+	if want := settings.Score.Start - 3; breached.Hearts != want {
+		t.Errorf("hearts = %d, want %d after both rules fired", breached.Hearts, want)
+	}
+	// The card explains itself from these, so each breach has to name its own signal.
+	named := map[string]bool{}
+	for _, penalty := range breached.Penalties {
+		named[penalty.Signal] = true
+	}
+	if !named["clippy"] || !named["coverage"] {
+		t.Errorf("penalties %+v do not name both signals", breached.Penalties)
+	}
+}
+
+// A probe that did not run reports nothing, which is not the same as reporting zero. Left
+// unguarded, every "under" rule fires on every worktree where the signal is absent.
+func TestUnreportedExternalSignalIsNotZero(t *testing.T) {
+	settings := config.Default()
+	settings.Signals.External.Penalties = map[string]config.ExternalPenalty{
+		"coverage": {Under: intPtr(80), Cost: 2},
+	}
+
+	result := Of(state.State{External: map[string]int{}}, "pass", settings)
+	if result.Hearts != settings.Score.Start {
+		t.Errorf("an absent coverage signal cost %d hearts", settings.Score.Start-result.Hearts)
+	}
+}
