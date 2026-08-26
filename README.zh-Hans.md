@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/header.png" alt="parallel-harness-pets" width="100%" />
+  <img src="docs/header.png" alt="termagitchi" width="100%" />
 </p>
 
 <p align="center">
@@ -30,21 +30,21 @@
 **Linux 和 macOS**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TevvvB/parallel-harness-pets/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/TevvvB/termagitchi/main/install.sh | sh
 pets install
 ```
 
 **macOS（Homebrew）**
 
 ```sh
-brew install TevvvB/tap/parallel-harness-pets
+brew install TevvvB/tap/termagitchi
 pets install
 ```
 
-**Windows** — 从 [Releases](https://github.com/TevvvB/parallel-harness-pets/releases)
+**Windows** — 从 [Releases](https://github.com/TevvvB/termagitchi/releases)
 下载压缩包，把 `pets` 放到 `PATH` 里，然后运行 `pets install`。
 
-**用 Go 安装** — `go install github.com/TevvvB/parallel-harness-pets/cmd/pets@latest`
+**用 Go 安装** — `go install github.com/TevvvB/termagitchi/cmd/pets@latest`
 
 `pets install` 会找到你装了哪些 agent 并把自己接进去。它改动过的配置会先备份，
 其他设置保持原样。装完之后开一个新会话。`pets uninstall` 可以还原。
@@ -143,4 +143,4 @@ MIT，见 [LICENSE](LICENSE)。
 ---
 
 > 此翻译基于英文版机器翻译。如果有读起来别扭的地方，
-> 欢迎通过 [issue](https://github.com/TevvvB/parallel-harness-pets/issues) 或 PR 指正。
+> 欢迎通过 [issue](https://github.com/TevvvB/termagitchi/issues) 或 PR 指正。

@@ -14,8 +14,8 @@ If that printed `not-installed`, the binary is missing. Do not try to install it
 yourself - print these two options and stop:
 
 ```sh
-brew install TevvvB/tap/parallel-harness-pets
-go install github.com/TevvvB/parallel-harness-pets/cmd/pets@latest
+brew install TevvvB/tap/termagitchi
+go install github.com/TevvvB/termagitchi/cmd/pets@latest
 ```
 
 Otherwise relay the installer's own output. It backs up any config it touches, and

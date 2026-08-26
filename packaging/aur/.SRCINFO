@@ -1,19 +1,19 @@
-pkgbase = parallel-harness-pets-bin
+pkgbase = termagitchi-bin
 	pkgdesc = A creature for every coding agent, in a den for every git worktree
 	pkgver = 0.2.3
 	pkgrel = 1
-	url = https://github.com/TevvvB/parallel-harness-pets
+	url = https://github.com/TevvvB/termagitchi
 	arch = x86_64
 	arch = aarch64
 	license = MIT
-	provides = parallel-harness-pets
+	provides = termagitchi
 	provides = pets
-	conflicts = parallel-harness-pets
+	conflicts = termagitchi
 	conflicts = pets
 	options = !strip
-	source_x86_64 = parallel-harness-pets_0.2.3_linux_amd64.tar.gz::https://github.com/TevvvB/parallel-harness-pets/releases/download/v0.2.3/parallel-harness-pets_0.2.3_linux_amd64.tar.gz
+	source_x86_64 = termagitchi_0.2.3_linux_amd64.tar.gz::https://github.com/TevvvB/termagitchi/releases/download/v0.2.3/termagitchi_0.2.3_linux_amd64.tar.gz
 	sha256sums_x86_64 = 787e950bfc9fc2044e6fbdaddc80df30dd3a3ef3f2dc97b04184d468187be42f
-	source_aarch64 = parallel-harness-pets_0.2.3_linux_arm64.tar.gz::https://github.com/TevvvB/parallel-harness-pets/releases/download/v0.2.3/parallel-harness-pets_0.2.3_linux_arm64.tar.gz
+	source_aarch64 = termagitchi_0.2.3_linux_arm64.tar.gz::https://github.com/TevvvB/termagitchi/releases/download/v0.2.3/termagitchi_0.2.3_linux_arm64.tar.gz
 	sha256sums_aarch64 = d3a7b609c6d51de495ce0fe86ba7b60afe60d69b3ba089215911bb1cf5e796a9
 
-pkgname = parallel-harness-pets-bin
+pkgname = termagitchi-bin

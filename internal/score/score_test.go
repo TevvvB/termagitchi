@@ -3,8 +3,8 @@ package score
 import (
 	"testing"
 
-	"github.com/TevvvB/parallel-harness-pets/internal/config"
-	"github.com/TevvvB/parallel-harness-pets/internal/state"
+	"github.com/TevvvB/termagitchi/internal/config"
+	"github.com/TevvvB/termagitchi/internal/state"
 )
 
 func TestScoringMatchesTheShellRules(t *testing.T) {

@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	latestURL = "https://github.com/TevvvB/parallel-harness-pets/releases/latest"
+	latestURL = "https://github.com/TevvvB/termagitchi/releases/latest"
 	// How long a fetched answer is trusted before asking again.
 	interval = 24 * time.Hour
 	// Short enough that a hanging network never keeps somebody waiting.
@@ -152,7 +152,7 @@ func writeCache(stateDir, version string, now time.Time) {
 func Command(executable string) string {
 	if strings.Contains(executable, "/Caskroom/") || strings.Contains(executable, "/Cellar/") ||
 		strings.Contains(executable, "/homebrew/") {
-		return "brew upgrade parallel-harness-pets"
+		return "brew upgrade termagitchi"
 	}
-	return "curl -fsSL https://raw.githubusercontent.com/TevvvB/parallel-harness-pets/main/install.sh | sh"
+	return "curl -fsSL https://raw.githubusercontent.com/TevvvB/termagitchi/main/install.sh | sh"
 }

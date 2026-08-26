@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TevvvB/parallel-harness-pets/internal/agents"
-	"github.com/TevvvB/parallel-harness-pets/internal/config"
-	"github.com/TevvvB/parallel-harness-pets/internal/identity"
-	"github.com/TevvvB/parallel-harness-pets/internal/score"
-	"github.com/TevvvB/parallel-harness-pets/internal/state"
+	"github.com/TevvvB/termagitchi/internal/agents"
+	"github.com/TevvvB/termagitchi/internal/config"
+	"github.com/TevvvB/termagitchi/internal/identity"
+	"github.com/TevvvB/termagitchi/internal/score"
+	"github.com/TevvvB/termagitchi/internal/state"
 	"time"
 )
 

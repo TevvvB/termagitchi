@@ -1,6 +1,6 @@
 # AUR package
 
-`parallel-harness-pets-bin` — installs the prebuilt Linux binary from the
+`termagitchi-bin` — installs the prebuilt Linux binary from the
 GitHub release, so no Go toolchain is needed on the user's machine.
 
 ## First-time publish
@@ -13,11 +13,11 @@ is not automated.
 2. Clone the (empty) package repo and copy these two files in:
 
    ```sh
-   git clone ssh://aur@aur.archlinux.org/parallel-harness-pets-bin.git
-   cd parallel-harness-pets-bin
+   git clone ssh://aur@aur.archlinux.org/termagitchi-bin.git
+   cd termagitchi-bin
    cp /path/to/claude-buddy/packaging/aur/{PKGBUILD,.SRCINFO} .
    git add PKGBUILD .SRCINFO
-   git commit -m "Initial import: parallel-harness-pets-bin 0.2.3"
+   git commit -m "Initial import: termagitchi-bin 0.2.3"
    git push
    ```
 
@@ -31,7 +31,7 @@ Bump `pkgver`, reset `pkgrel=1`, and replace both checksums with the ones from
 that release's `checksums.txt`:
 
 ```sh
-curl -sL https://github.com/TevvvB/parallel-harness-pets/releases/download/vX.Y.Z/checksums.txt | grep linux
+curl -sL https://github.com/TevvvB/termagitchi/releases/download/vX.Y.Z/checksums.txt | grep linux
 ```
 
 Take the hashes from the published `checksums.txt` rather than hashing a local

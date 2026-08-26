@@ -1,4 +1,4 @@
-module github.com/TevvvB/parallel-harness-pets
+module github.com/TevvvB/termagitchi
 
 go 1.24
 

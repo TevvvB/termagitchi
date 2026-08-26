@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/TevvvB/parallel-harness-pets/internal/agents"
-	"github.com/TevvvB/parallel-harness-pets/internal/gitrepo"
-	"github.com/TevvvB/parallel-harness-pets/internal/identity"
-	"github.com/TevvvB/parallel-harness-pets/internal/state"
+	"github.com/TevvvB/termagitchi/internal/agents"
+	"github.com/TevvvB/termagitchi/internal/gitrepo"
+	"github.com/TevvvB/termagitchi/internal/identity"
+	"github.com/TevvvB/termagitchi/internal/state"
 )
 
 // worktree fakes just enough of a checkout for gitrepo.Locate, which reads

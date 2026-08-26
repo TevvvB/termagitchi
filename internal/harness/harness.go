@@ -25,7 +25,7 @@ const (
 // ours matches commands this tool wrote, including under its former name, so a
 // re-run replaces its own entries instead of stacking duplicates.
 func ours(command string) bool {
-	for _, marker := range []string{"parallel-harness-pets", "claude-buddy", "/pets "} {
+	for _, marker := range []string{"termagitchi", "parallel-harness-pets", "claude-buddy", "/pets "} {
 		if strings.Contains(command, marker) {
 			return true
 		}

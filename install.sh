@@ -1,14 +1,14 @@
 #!/bin/sh
-# Install parallel-harness-pets.
+# Install termagitchi.
 #
-#   curl -fsSL https://raw.githubusercontent.com/TevvvB/parallel-harness-pets/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/TevvvB/termagitchi/main/install.sh | sh
 #
 # Honours PETS_VERSION to pin a release and PETS_INSTALL_DIR to choose where the
 # binary lands. Downloads are checksummed against the release before install.
 
 set -eu
 
-REPO="TevvvB/parallel-harness-pets"
+REPO="TevvvB/termagitchi"
 INSTALL_DIR="${PETS_INSTALL_DIR:-$HOME/.local/bin}"
 
 say() { printf '%s\n' "$*"; }
@@ -76,10 +76,10 @@ checksum() {
 target=$(detect_target)
 version="${PETS_VERSION:-$(latest_version)}"
 version="${version#v}"
-archive="parallel-harness-pets_${version}_${target}.tar.gz"
+archive="termagitchi_${version}_${target}.tar.gz"
 base="https://github.com/$REPO/releases/download/v${version}"
 
-say "parallel-harness-pets ${version} (${target})"
+say "termagitchi ${version} (${target})"
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT INT TERM

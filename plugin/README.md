@@ -4,8 +4,8 @@ Two skills, and a marketplace entry so people can find this from inside Claude C
 rather than having to hear about it first.
 
 ```
-/plugin marketplace add TevvvB/parallel-harness-pets
-/plugin install pets@parallel-harness-pets
+/plugin marketplace add TevvvB/termagitchi
+/plugin install pets@termagitchi
 /pets-setup
 ```
 
@@ -36,8 +36,8 @@ wiring. `/pets-setup` is the seam between them.
 A plugin carries configuration, not executables:
 
 ```sh
-brew install TevvvB/tap/parallel-harness-pets
-# or: go install github.com/TevvvB/parallel-harness-pets/cmd/pets@latest
+brew install TevvvB/tap/termagitchi
+# or: go install github.com/TevvvB/termagitchi/cmd/pets@latest
 ```
 
 `/pets-setup` checks for it first and prints those two lines rather than failing at

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/header.png" alt="parallel-harness-pets" width="100%" />
+  <img src="docs/header.png" alt="termagitchi" width="100%" />
 </p>
 
 <p align="center">
@@ -30,21 +30,21 @@
 **Linux と macOS**
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/TevvvB/parallel-harness-pets/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/TevvvB/termagitchi/main/install.sh | sh
 pets install
 ```
 
 **macOS（Homebrew）**
 
 ```sh
-brew install TevvvB/tap/parallel-harness-pets
+brew install TevvvB/tap/termagitchi
 pets install
 ```
 
-**Windows** — [Releases](https://github.com/TevvvB/parallel-harness-pets/releases)
+**Windows** — [Releases](https://github.com/TevvvB/termagitchi/releases)
 からアーカイブを取得し、`pets` を `PATH` に置いてから `pets install` を実行してください。
 
-**Go を使う場合** — `go install github.com/TevvvB/parallel-harness-pets/cmd/pets@latest`
+**Go を使う場合** — `go install github.com/TevvvB/termagitchi/cmd/pets@latest`
 
 `pets install` はインストール済みのエージェントを見つけて自分を組み込みます。触れた設定は
 バックアップし、それ以外の設定はそのまま残します。実行後は新しいセッションを開いてください。
@@ -149,4 +149,4 @@ MIT。[LICENSE](LICENSE) を参照してください。
 ---
 
 > この翻訳は英語版からの機械翻訳をもとにしています。不自然な表現があれば
-> [issue](https://github.com/TevvvB/parallel-harness-pets/issues) や PR で直してもらえると助かります。
+> [issue](https://github.com/TevvvB/termagitchi/issues) や PR で直してもらえると助かります。
