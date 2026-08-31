@@ -41,8 +41,10 @@ brew install TevvvB/tap/termagitchi
 pets install
 ```
 
-**Windows** — [Releases](https://github.com/TevvvB/termagitchi/releases)
-からアーカイブを取得し、`pets` を `PATH` に置いてから `pets install` を実行してください。
+**Windows** — `scoop bucket add tevvvb https://github.com/TevvvB/scoop-bucket` の後に
+`scoop install termagitchi`、そして `pets install` を実行してください。
+[Releases](https://github.com/TevvvB/termagitchi/releases) からアーカイブを取得して
+`pets` を自分で `PATH` に置く方法でも構いません。
 
 **Go を使う場合** — `go install github.com/TevvvB/termagitchi/cmd/pets@latest`
 

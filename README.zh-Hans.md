@@ -41,8 +41,10 @@ brew install TevvvB/tap/termagitchi
 pets install
 ```
 
-**Windows** — 从 [Releases](https://github.com/TevvvB/termagitchi/releases)
-下载压缩包，把 `pets` 放到 `PATH` 里，然后运行 `pets install`。
+**Windows** — 先 `scoop bucket add tevvvb https://github.com/TevvvB/scoop-bucket`，
+再 `scoop install termagitchi`，然后运行 `pets install`。
+也可以从 [Releases](https://github.com/TevvvB/termagitchi/releases) 下载压缩包，
+自己把 `pets` 放到 `PATH` 里。
 
 **用 Go 安装** — `go install github.com/TevvvB/termagitchi/cmd/pets@latest`
 

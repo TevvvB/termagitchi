@@ -69,9 +69,10 @@ The plugin carries the two skills; `pets install` still owns the status line and
 hooks, which is what `/pets-setup` runs. You need the binary either way - a plugin
 carries configuration, not executables. See [plugin/README.md](plugin/README.md).
 
-**Windows** - grab an archive from
-[Releases](https://github.com/TevvvB/termagitchi/releases), put `pets`
-on your `PATH`, then run `pets install`.
+**Windows** - `scoop bucket add tevvvb https://github.com/TevvvB/scoop-bucket`
+then `scoop install termagitchi`, and run `pets install`. Or grab an archive from
+[Releases](https://github.com/TevvvB/termagitchi/releases) and put `pets` on your
+`PATH` yourself.
 
 **With Go** - `go install github.com/TevvvB/termagitchi/cmd/pets@latest`
 
