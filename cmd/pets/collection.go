@@ -27,7 +27,7 @@ func updateNotice(settings config.Config) string {
 	if err != nil {
 		return ""
 	}
-	latest := release.Check(config.StateDir(), version, settings.Update.Check, time.Now())
+	latest := release.Check(config.StateDir(), resolvedVersion(), settings.Update.Check, time.Now())
 	return render.UpdateNotice(latest, release.Command(executable))
 }
 
