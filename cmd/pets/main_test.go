@@ -152,3 +152,18 @@ func TestVersionExitsZero(t *testing.T) {
 		}
 	}
 }
+
+// A `go install pkg@vX.Y.Z` build carries no ldflag, so without a fallback it calls
+// itself dev, and release.Newer deliberately ignores an unparseable version — meaning
+// source installs never hear about an upgrade.
+func TestModuleVersionNormalisesWhatTheGoToolRecords(t *testing.T) {
+	for recorded, want := range map[string]string{
+		"v0.2.9":  "0.2.9", // go install of a tag
+		"(devel)": "dev",   // built from a working tree
+		"":        "dev",   // no build info at all
+	} {
+		if got := moduleVersion(recorded); got != want {
+			t.Errorf("moduleVersion(%q) = %q, want %q", recorded, got, want)
+		}
+	}
+}

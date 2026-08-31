@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -25,6 +26,29 @@ import (
 )
 
 var version = "dev"
+
+// resolvedVersion prefers the ldflag a release build carries and falls back to the
+// module version the go tool records, so a `go install pkg@v0.2.9` build knows what it
+// is instead of calling itself dev and silently opting out of update checks.
+func resolvedVersion() string {
+	if version != "dev" {
+		return version
+	}
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return version
+	}
+	return moduleVersion(info.Main.Version)
+}
+
+// moduleVersion normalises what ReadBuildInfo reports. A build from a working tree says
+// "(devel)", which is the same thing as dev.
+func moduleVersion(recorded string) string {
+	if recorded == "" || strings.HasPrefix(recorded, "(") {
+		return "dev"
+	}
+	return strings.TrimPrefix(recorded, "v")
+}
 
 const usage = `pets - a creature for every worktree
 
@@ -78,7 +102,7 @@ func dispatch(args []string) int {
 	case "install", "uninstall":
 		installCommand(args[0], args[1:])
 	case "version", "--version", "-v":
-		fmt.Println(version)
+		fmt.Println(resolvedVersion())
 	default:
 		fmt.Fprintf(os.Stderr, "pets: unknown command %q\n\n%s", args[0], usage)
 		return 1
