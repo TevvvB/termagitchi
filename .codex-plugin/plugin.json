@@ -1,0 +1,25 @@
+{
+  "name": "termagitchi",
+  "version": "0.2.9",
+  "description": "A creature for every git worktree, living in your coding agent's status line. Deterministic species, rarity, and mood from worktree tidiness.",
+  "repository": "https://github.com/TevvvB/termagitchi",
+  "homepage": "https://github.com/TevvvB/termagitchi",
+  "license": "MIT",
+  "author": {
+    "name": "TevvvB",
+    "url": "https://github.com/TevvvB"
+  },
+  "keywords": [
+    "statusline",
+    "worktree",
+    "parallel-agents",
+    "gacha",
+    "codex",
+    "terminal-pet"
+  ],
+  "interface": {
+    "displayName": "TermaGITchi",
+    "shortDescription": "Per-worktree terminal pet whose mood tracks git hygiene.",
+    "composerIcon": "./assets/icon.svg"
+  }
+}
