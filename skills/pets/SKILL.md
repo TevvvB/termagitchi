@@ -1,6 +1,8 @@
 ---
 name: pets
 description: "Show this worktree's creature and the branch-hygiene signals behind its mood. Use when the user asks about their pet or types /pets."
+version: "0.2.9"
+author: TevvvB
 ---
 
 # Pets
