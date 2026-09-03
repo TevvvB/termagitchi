@@ -1,6 +1,8 @@
 ---
 name: pets-setup
 description: "Wire pets into this machine's Codex config, or say how to install the binary. Use when the user asks to set pets up for Codex or types /pets-setup."
+version: "0.2.9"
+author: TevvvB
 ---
 
 # Pets setup (Codex)
@@ -27,14 +29,16 @@ Relay the installer's own output either way. It backs up any config it touches, 
 `pets uninstall` reverses it.
 
 If `command -v pets` fails, the binary is missing. Do not install it yourself —
-print these options and stop:
+print these preferred options and stop:
 
 ```sh
 brew install TevvvB/tap/termagitchi
 go install github.com/TevvvB/termagitchi/cmd/pets@latest
 ```
 
-(or `curl -fsSL https://raw.githubusercontent.com/TevvvB/termagitchi/main/install.sh | sh`)
+If the user cannot use Homebrew or Go, point them at the repo's `install.sh` on
+GitHub (`https://github.com/TevvvB/termagitchi/blob/main/install.sh`) and let
+them review it before running. Do not paste a `curl | sh` one-liner.
 
 ## Codex trust warning
 
