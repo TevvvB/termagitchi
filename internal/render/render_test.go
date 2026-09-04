@@ -304,3 +304,46 @@ func TestHookMessageCarriesScoreAndCounts(t *testing.T) {
 		t.Errorf("hook message carries ANSI: %q", message)
 	}
 }
+
+func TestStatuslineShowsContextWhenKnown(t *testing.T) {
+	base := view("feat/oauth-flow", 4, false)
+	plain := stripANSI(Statusline(base, config.Default()))
+	if strings.Contains(plain, "%") {
+		t.Errorf("statusline without context leaked a percent: %q", plain)
+	}
+
+	base.Context = 42
+	with := stripANSI(Statusline(base, config.Default()))
+	if !strings.Contains(with, "· 42%") {
+		t.Errorf("statusline missing context fill, got %q", with)
+	}
+
+	base.Context = ContextFull
+	warned := Statusline(base, config.Default())
+	if !strings.Contains(warned, warn) {
+		t.Errorf("context at ContextFull should use warn tone, got %q", warned)
+	}
+	if !strings.HasSuffix(warned, reset) {
+		t.Error("statusline with context must still end in colour reset")
+	}
+}
+
+func TestJSONIncludesContextWhenKnown(t *testing.T) {
+	base := view("feat/oauth-flow", 4, false)
+	out, err := JSON(base, config.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(out, `"context"`) {
+		t.Errorf("JSON without context should omit the key, got %s", out)
+	}
+
+	base.Context = 91
+	out, err = JSON(base, config.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, `"context":91`) {
+		t.Errorf("JSON missing context, got %s", out)
+	}
+}

@@ -281,6 +281,7 @@ func build(directory string, who agent, settings config.Config) (render.View, bo
 		State:    current,
 		Tests:    tests,
 		Model:    who.Model,
+		Context:  who.Context,
 		HasState: hasState,
 	}
 	if hasState {

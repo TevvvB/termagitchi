@@ -44,6 +44,9 @@ type View struct {
 	State    state.State
 	Tests    string
 	Model    string
+	// Context is the asking agent's context-window fill percentage; zero means
+	// unknown (hooks and non-statusline surfaces often omit it).
+	Context  int
 	HasState bool
 }
 
@@ -223,7 +226,10 @@ func Statusline(v View, settings config.Config) string {
 	if v.Model != "" {
 		parts = append(parts, dim+"·"+reset, dim+v.Model+reset)
 	}
-	return strings.Join(parts, " ")
+	// Context rides after model: party already shows it per resident; the status
+	// line is where competitors surface the same signal for the asking agent.
+	out := strings.Join(parts, " ")
+	return out + contextNote(v.Context)
 }
 
 // Tmux uses tmux's own colour syntax so the segment inherits the bar's styling.
@@ -265,6 +271,9 @@ func JSON(v View, settings config.Config) (string, error) {
 	}
 	if len(v.State.External) > 0 {
 		payload["external"] = v.State.External
+	}
+	if v.Context > 0 {
+		payload["context"] = v.Context
 	}
 	encoded, err := json.Marshal(payload)
 	return string(encoded), err
