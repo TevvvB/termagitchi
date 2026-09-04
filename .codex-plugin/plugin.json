@@ -1,0 +1,46 @@
+{
+  "name": "termagitchi",
+  "version": "0.2.9",
+  "description": "A creature for every git worktree, living in your coding agent's status line. Deterministic species, rarity, and mood from worktree tidiness.",
+  "repository": "https://github.com/TevvvB/termagitchi",
+  "homepage": "https://github.com/TevvvB/termagitchi",
+  "license": "MIT",
+  "author": {
+    "name": "TevvvB",
+    "url": "https://github.com/TevvvB"
+  },
+  "keywords": [
+    "statusline",
+    "worktree",
+    "parallel-agents",
+    "gacha",
+    "codex",
+    "terminal-pet"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "TermaGITchi",
+    "shortDescription": "Per-worktree terminal pet whose mood tracks git hygiene.",
+    "longDescription": "TermaGITchi gives every git worktree a deterministic creature in your coding agent's status line. Species, rarity, and mood come from branch hygiene signals (uncommitted files, unpushed commits), so parallel agents stay visually distinct without picking or renaming pets.",
+    "developerName": "TevvvB",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Automation"
+    ],
+    "websiteURL": "https://github.com/TevvvB/termagitchi",
+    "privacyPolicyURL": "https://github.com/TevvvB/termagitchi/blob/main/SECURITY.md",
+    "termsOfServiceURL": "https://github.com/TevvvB/termagitchi/blob/main/LICENSE",
+    "defaultPrompt": [
+      "Show my TermaGITchi pet card for this worktree",
+      "Set up pets for Codex on this machine",
+      "Why is my TermaGITchi mood warning?"
+    ],
+    "brandColor": "#7C3AED",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "screenshots": [
+      "./docs/screenshot.png"
+    ]
+  }
+}

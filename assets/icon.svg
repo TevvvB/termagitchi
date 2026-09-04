@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="TermaGITchi creature">
+  <defs>
+    <radialGradient id="face" cx="50%" cy="42%" r="58%">
+      <stop offset="0%" stop-color="#ffe08a"/>
+      <stop offset="70%" stop-color="#f0a83a"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </radialGradient>
+  </defs>
+  <!-- soft outer ring for contrast at tiny sizes -->
+  <circle cx="256" cy="256" r="230" fill="#1a1a1a"/>
+  <!-- body / face -->
+  <circle cx="256" cy="256" r="208" fill="url(#face)"/>
+  <!-- ear bumps -->
+  <circle cx="118" cy="150" r="52" fill="#f0a83a" stroke="#1a1a1a" stroke-width="14"/>
+  <circle cx="394" cy="150" r="52" fill="#f0a83a" stroke="#1a1a1a" stroke-width="14"/>
+  <circle cx="118" cy="150" r="28" fill="#ffe08a"/>
+  <circle cx="394" cy="150" r="28" fill="#ffe08a"/>
+  <!-- eyes -->
+  <ellipse cx="188" cy="240" rx="36" ry="44" fill="#1a1a1a"/>
+  <ellipse cx="324" cy="240" rx="36" ry="44" fill="#1a1a1a"/>
+  <circle cx="200" cy="224" r="12" fill="#ffffff"/>
+  <circle cx="336" cy="224" r="12" fill="#ffffff"/>
+  <!-- blush -->
+  <ellipse cx="140" cy="292" rx="28" ry="14" fill="#f472b6" opacity="0.55"/>
+  <ellipse cx="372" cy="292" rx="28" ry="14" fill="#f472b6" opacity="0.55"/>
+  <!-- smile -->
+  <path d="M196 318 Q256 372 316 318" fill="none" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round"/>
+  <!-- tiny nose -->
+  <ellipse cx="256" cy="278" rx="10" ry="7" fill="#1a1a1a"/>
+</svg>
