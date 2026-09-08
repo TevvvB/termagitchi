@@ -46,8 +46,11 @@ type View struct {
 	Model    string
 	// Context is the asking agent's context-window fill percentage; zero means
 	// unknown (hooks and non-statusline surfaces often omit it).
-	Context  int
-	HasState bool
+	Context int
+	// ContextETA is the burn-rate estimate of time until the window is full.
+	// Zero means unknown; only the asking agent's status line usually has it.
+	ContextETA time.Duration
+	HasState   bool
 }
 
 // Home is the den's compact form: the flight code, marked with an "at" so a
@@ -229,7 +232,7 @@ func Statusline(v View, settings config.Config) string {
 	// Context rides after model: party already shows it per resident; the status
 	// line is where competitors surface the same signal for the asking agent.
 	out := strings.Join(parts, " ")
-	return out + contextNote(v.Context)
+	return out + contextNote(v.Context, v.ContextETA)
 }
 
 // Tmux uses tmux's own colour syntax so the segment inherits the bar's styling.
@@ -275,6 +278,9 @@ func JSON(v View, settings config.Config) (string, error) {
 	if v.Context > 0 {
 		payload["context"] = v.Context
 	}
+	if v.ContextETA > 0 {
+		payload["context_eta_m"] = int(v.ContextETA.Minutes())
+	}
 	encoded, err := json.Marshal(payload)
 	return string(encoded), err
 }
@@ -302,14 +308,22 @@ func since(then, now time.Time) string {
 // ContextFull is where the figure stops being dim and starts warning: an agent near the end of its window is actionable.
 const ContextFull = 80
 
-// contextNote renders the fill, or nothing when unknown, so a hook-only harness is never shown a confident 0%.
-func contextNote(percent int) string {
+// contextNote renders the fill (and optional ETA), or nothing when unknown, so a
+// hook-only harness is never shown a confident 0%.
+func contextNote(percent int, eta time.Duration) string {
 	if percent <= 0 {
 		return ""
 	}
 	tone := dim
 	if percent >= ContextFull {
 		tone = warn
+	}
+	if eta > 0 {
+		mins := int(eta.Minutes())
+		if mins < 1 {
+			mins = 1
+		}
+		return fmt.Sprintf(" %s· %d%% ~%dm%s", tone, percent, mins, reset)
 	}
 	return fmt.Sprintf(" %s· %d%%%s", tone, percent, reset)
 }
@@ -357,7 +371,7 @@ func Residents(v View, now time.Time) string {
 			marker, tone, pad(body, width), reset,
 			tone, pad(pet.Name, 9), reset,
 			dim, pad(truncate(resident.Label(), 32), 34), since(resident.Seen, now), note,
-			contextNote(resident.Context))
+			contextNote(resident.Context, resident.ContextETA()))
 	}
 	return out.String()
 }

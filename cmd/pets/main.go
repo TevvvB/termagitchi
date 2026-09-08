@@ -284,6 +284,12 @@ func build(directory string, who agent, settings config.Config) (render.View, bo
 		Context:  who.Context,
 		HasState: hasState,
 	}
+	if live, ok := agents.Get(cacheDir, who.SessionID); ok {
+		if view.Context == 0 {
+			view.Context = live.Context
+		}
+		view.ContextETA = live.ContextETA()
+	}
 	if hasState {
 		view.Score = score.Of(current, tests, settings)
 	}
@@ -513,6 +519,8 @@ func quipFor(view render.View) string {
 		return fmt.Sprintf("%d migration heads. that one never fixes itself.", view.State.Migrations)
 	case view.Tests == "fail":
 		return "tests are red. i saw it."
+	case view.Context >= render.ContextFull:
+		return "context is packing. /compact before it eats the thread."
 	case view.State.Unpushed > 5:
 		return fmt.Sprintf("%d unpushed. this branch only exists on your laptop.", view.State.Unpushed)
 	case view.State.Dirty > 15:

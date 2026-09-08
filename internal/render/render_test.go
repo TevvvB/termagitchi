@@ -318,6 +318,12 @@ func TestStatuslineShowsContextWhenKnown(t *testing.T) {
 		t.Errorf("statusline missing context fill, got %q", with)
 	}
 
+	base.ContextETA = 12 * time.Minute
+	withETA := stripANSI(Statusline(base, config.Default()))
+	if !strings.Contains(withETA, "· 42% ~12m") {
+		t.Errorf("statusline missing context ETA, got %q", withETA)
+	}
+
 	base.Context = ContextFull
 	warned := Statusline(base, config.Default())
 	if !strings.Contains(warned, warn) {
@@ -345,5 +351,18 @@ func TestJSONIncludesContextWhenKnown(t *testing.T) {
 	}
 	if !strings.Contains(out, `"context":91`) {
 		t.Errorf("JSON missing context, got %s", out)
+	}
+}
+
+func TestJSONIncludesContextETAWhenKnown(t *testing.T) {
+	base := view("feat/oauth-flow", 4, false)
+	base.Context = 91
+	base.ContextETA = 7 * time.Minute
+	out, err := JSON(base, config.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, `"context":91`) || !strings.Contains(out, `"context_eta_m":7`) {
+		t.Errorf("JSON missing context ETA fields, got %s", out)
 	}
 }
