@@ -168,7 +168,7 @@ There is no `workspace` object in a Codex payload, so the den name comes from gi
 | `⑂2` | 2 heads in one migration tree |
 | `✗` | last test or lint run failed |
 | `-.-` with `·····` | still waking up, in the first second of a session |
-| `· 72%` | how full that agent's context window is, on its row in `pets party` and `pets card`. Dim until 80%, then it warns. Absent when the harness does not report one |
+| `· 72%` `~12m` | how full that agent's context window is, and a burn-rate guess of time left — on the Claude Code statusline and on its row in `pets party` / `pets card`. Dim until 80%, then it warns. The `~Nm` ETA appears after two fill samples; both are absent when the harness does not report a window |
 
 You start at five hearts and lose one for any uncommitted file, another past 15,
 one for any unpushed commit, another past 5, and two for a failing test run. All
@@ -179,8 +179,9 @@ result older than two hours is forgotten, so a red mark never haunts a branch
 you already fixed.
 
 Mood belongs to the worktree, so every agent working in one shares it. Context fill is
-the exception: it is per agent, which is why it sits on the agent's row rather than in
-the face.
+the exception: it is per agent, which is why it sits on the statusline and the agent's
+row rather than in the face. The optional `~Nm` is estimated from how fast that agent's
+fill has been climbing, so you know when to `/compact`, not only how full you are.
 
 ## Seeing every worktree at once
 
