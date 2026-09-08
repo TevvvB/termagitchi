@@ -135,13 +135,17 @@ common과 uncommon에는 각자의 색조가 배정되어 같은 종이라도 �
 | 에이전트 | 지원 범위 |
 |---|---|
 | Claude Code | 전체 지원. 상태줄, 부화, 한마디 |
-| Codex CLI | 훅은 작성했으나 실제로 검증하지 못함. 펫 표시는 셸 스니펫으로 |
+| Codex CLI | 훅은 동작하지만 Codex가 먼저 신뢰해야 함 — 아래 참고. 상태줄은 없으므로 펫 표시는 셸 스니펫으로 |
 | tmux / 셸 프롬프트 | 전체 지원. **모든** 에이전트에서 동작 |
 | 에디터 | `pets render --format=json`으로 직접 구현 |
 
 tmux와 셸 방식은 에이전트에 아무것도 요구하지 않으므로 Aider, Amp, Gemini CLI 등에서도
 동작합니다. 엔드투엔드로 검증된 것은 Claude Code뿐입니다. 다른 것에서 되거나 안 되면
 issue를 남겨주시면 좋겠습니다.
+
+**Codex 훅은 실행 전에 신뢰해야 합니다.** 이게 핵심인데 아무도 알려주지 않습니다. Codex는 새/변경된 훅을 수락하기 전까지 실행하지 않고, 신뢰되지 않은 훅은 완전히 침묵하며, `codex doctor`도 훅을 언급하지 않습니다. 그래서 `pets install --harness=codex`는 된 것처럼 보이지만 다음 세션 시작에서 수락하기 전까지는 아무 일도 하지 않습니다. Codex 0.149.0에서 검증됨 — 같은 설정은 `--dangerously-bypass-hook-trust`로 실행할 때만 동작합니다.
+
+신뢰하면 동작합니다. Codex 페이로드에는 `session_id`가 있고 이게 크리처 키이므로, 에이전트가 등록되고 `pets den`과 `pets party`가 Claude Code에서처럼 채워집니다. Codex 페이로드에는 `workspace` 객체가 없어서 둥지 이름은 git에서 가져옵니다.
 
 ## 라이선스
 
