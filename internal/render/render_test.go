@@ -366,3 +366,59 @@ func TestJSONIncludesContextETAWhenKnown(t *testing.T) {
 		t.Errorf("JSON missing context ETA fields, got %s", out)
 	}
 }
+
+func TestStatuslineShowsRateLimitsWhenKnown(t *testing.T) {
+	base := view("feat/oauth-flow", 4, false)
+	plain := stripANSI(Statusline(base, config.Default()))
+	if strings.Contains(plain, "5h") || strings.Contains(plain, "7d") {
+		t.Errorf("statusline without rate limits leaked a quota label: %q", plain)
+	}
+
+	base.Rate5h = 38
+	base.Rate7d = 10
+	with := stripANSI(Statusline(base, config.Default()))
+	if !strings.Contains(with, "· 5h 38%") || !strings.Contains(with, "· 7d 10%") {
+		t.Errorf("statusline missing rate limits, got %q", with)
+	}
+
+	base.Rate5hLeft = 2 * time.Hour
+	base.Rate7dLeft = 6 * 24 * time.Hour
+	withLeft := stripANSI(Statusline(base, config.Default()))
+	if !strings.Contains(withLeft, "· 5h 38% ~2h") {
+		t.Errorf("statusline missing 5h reset countdown, got %q", withLeft)
+	}
+	if !strings.Contains(withLeft, "· 7d 10% ~6d") {
+		t.Errorf("statusline missing 7d reset countdown, got %q", withLeft)
+	}
+
+	base.Rate5h = ContextFull
+	warned := Statusline(base, config.Default())
+	if !strings.Contains(warned, warn) {
+		t.Errorf("rate limit at ContextFull should use warn tone, got %q", warned)
+	}
+}
+
+func TestJSONIncludesRateLimitsWhenKnown(t *testing.T) {
+	base := view("feat/oauth-flow", 4, false)
+	out, err := JSON(base, config.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(out, "rate_limit") {
+		t.Errorf("JSON without rate limits should omit the keys, got %s", out)
+	}
+
+	base.Rate5h = 38
+	base.Rate5hLeft = 125 * time.Minute
+	base.Rate7d = 10
+	out, err = JSON(base, config.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, `"rate_limit_5h":38`) || !strings.Contains(out, `"rate_limit_5h_left_m":125`) {
+		t.Errorf("JSON missing 5h rate limit fields, got %s", out)
+	}
+	if !strings.Contains(out, `"rate_limit_7d":10`) {
+		t.Errorf("JSON missing 7d rate limit, got %s", out)
+	}
+}

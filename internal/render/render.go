@@ -50,6 +50,14 @@ type View struct {
 	// ContextETA is the burn-rate estimate of time until the window is full.
 	// Zero means unknown; only the asking agent's status line usually has it.
 	ContextETA time.Duration
+	// Rate5h / Rate7d are Claude Code subscription quota fills (percent). Zero
+	// means the harness did not report them — typical for Codex, tmux, and hooks.
+	Rate5h int
+	Rate7d int
+	// Rate5hLeft / Rate7dLeft are time until that quota window resets. Zero means
+	// unknown; only statusline JSON usually carries resets_at.
+	Rate5hLeft time.Duration
+	Rate7dLeft time.Duration
 	HasState   bool
 }
 
@@ -229,10 +237,14 @@ func Statusline(v View, settings config.Config) string {
 	if v.Model != "" {
 		parts = append(parts, dim+"·"+reset, dim+v.Model+reset)
 	}
-	// Context rides after model: party already shows it per resident; the status
-	// line is where competitors surface the same signal for the asking agent.
+	// Context and rate-limit fills ride after model: party already shows context
+	// per resident; the status line is where competitors (notably codachi) also
+	// surface the asking agent's 5h/7d quota. Mood stays worktree hygiene.
 	out := strings.Join(parts, " ")
-	return out + contextNote(v.Context, v.ContextETA)
+	out += contextNote(v.Context, v.ContextETA)
+	out += rateLimitNote("5h", v.Rate5h, v.Rate5hLeft)
+	out += rateLimitNote("7d", v.Rate7d, v.Rate7dLeft)
+	return out
 }
 
 // Tmux uses tmux's own colour syntax so the segment inherits the bar's styling.
@@ -281,6 +293,18 @@ func JSON(v View, settings config.Config) (string, error) {
 	if v.ContextETA > 0 {
 		payload["context_eta_m"] = int(v.ContextETA.Minutes())
 	}
+	if v.Rate5h > 0 {
+		payload["rate_limit_5h"] = v.Rate5h
+	}
+	if v.Rate5hLeft > 0 {
+		payload["rate_limit_5h_left_m"] = int(v.Rate5hLeft.Minutes())
+	}
+	if v.Rate7d > 0 {
+		payload["rate_limit_7d"] = v.Rate7d
+	}
+	if v.Rate7dLeft > 0 {
+		payload["rate_limit_7d_left_m"] = int(v.Rate7dLeft.Minutes())
+	}
 	encoded, err := json.Marshal(payload)
 	return string(encoded), err
 }
@@ -326,6 +350,41 @@ func contextNote(percent int, eta time.Duration) string {
 		return fmt.Sprintf(" %s· %d%% ~%dm%s", tone, percent, mins, reset)
 	}
 	return fmt.Sprintf(" %s· %d%%%s", tone, percent, reset)
+}
+
+// rateLimitNote renders a named quota fill (and optional time-to-reset), or
+// nothing when unknown. Same warn threshold as context so a nearly-spent 5h
+// window reads the same way as a nearly-full context window.
+func rateLimitNote(label string, percent int, left time.Duration) string {
+	if percent <= 0 {
+		return ""
+	}
+	tone := dim
+	if percent >= ContextFull {
+		tone = warn
+	}
+	if left > 0 {
+		if left >= 24*time.Hour {
+			days := int(left.Hours()) / 24
+			if days < 1 {
+				days = 1
+			}
+			return fmt.Sprintf(" %s· %s %d%% ~%dd%s", tone, label, percent, days, reset)
+		}
+		if left >= time.Hour {
+			hours := int(left.Hours())
+			if hours < 1 {
+				hours = 1
+			}
+			return fmt.Sprintf(" %s· %s %d%% ~%dh%s", tone, label, percent, hours, reset)
+		}
+		mins := int(left.Minutes())
+		if mins < 1 {
+			mins = 1
+		}
+		return fmt.Sprintf(" %s· %s %d%% ~%dm%s", tone, label, percent, mins, reset)
+	}
+	return fmt.Sprintf(" %s· %s %d%%%s", tone, label, percent, reset)
 }
 
 func Residents(v View, now time.Time) string {
