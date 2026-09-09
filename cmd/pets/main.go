@@ -136,6 +136,18 @@ type hookPayload struct {
 	ContextWindow struct {
 		UsedPercentage int `json:"used_percentage"`
 	} `json:"context_window"`
+	// RateLimits are Claude Code subscription quotas. Absent on Codex and on
+	// surfaces that never pipe statusline JSON.
+	RateLimits struct {
+		FiveHour struct {
+			UsedPercentage int   `json:"used_percentage"`
+			ResetsAt       int64 `json:"resets_at"`
+		} `json:"five_hour"`
+		SevenDay struct {
+			UsedPercentage int   `json:"used_percentage"`
+			ResetsAt       int64 `json:"resets_at"`
+		} `json:"seven_day"`
+	} `json:"rate_limits"`
 	ToolInput struct {
 		Command string `json:"command"`
 	} `json:"tool_input"`
@@ -146,22 +158,30 @@ type hookPayload struct {
 // which den it is asking from. Every field is optional, because tmux, a shell
 // prompt and `pets card` supply none of them.
 type agent struct {
-	SessionID string
-	Name      string
-	Repo      string
-	Worktree  string
-	Model     string
-	Context   int
+	SessionID   string
+	Name        string
+	Repo        string
+	Worktree    string
+	Model       string
+	Context     int
+	Rate5h      int
+	Rate5hReset int64
+	Rate7d      int
+	Rate7dReset int64
 }
 
 func (p hookPayload) agent() agent {
 	return agent{
-		SessionID: p.SessionID,
-		Name:      p.SessionName,
-		Repo:      p.Workspace.Repo.Name,
-		Worktree:  p.Workspace.GitWorktree,
-		Model:     p.Model.DisplayName,
-		Context:   p.ContextWindow.UsedPercentage,
+		SessionID:   p.SessionID,
+		Name:        p.SessionName,
+		Repo:        p.Workspace.Repo.Name,
+		Worktree:    p.Workspace.GitWorktree,
+		Model:       p.Model.DisplayName,
+		Context:     p.ContextWindow.UsedPercentage,
+		Rate5h:      p.RateLimits.FiveHour.UsedPercentage,
+		Rate5hReset: p.RateLimits.FiveHour.ResetsAt,
+		Rate7d:      p.RateLimits.SevenDay.UsedPercentage,
+		Rate7dReset: p.RateLimits.SevenDay.ResetsAt,
 	}
 }
 
@@ -281,7 +301,28 @@ func build(directory string, who agent, settings config.Config) (render.View, bo
 		State:    current,
 		Tests:    tests,
 		Model:    who.Model,
+		Context:  who.Context,
+		Rate5h:   who.Rate5h,
+		Rate7d:   who.Rate7d,
 		HasState: hasState,
+	}
+	if who.Rate5hReset > 0 {
+		until := time.Unix(who.Rate5hReset, 0)
+		if until.After(now) {
+			view.Rate5hLeft = until.Sub(now)
+		}
+	}
+	if who.Rate7dReset > 0 {
+		until := time.Unix(who.Rate7dReset, 0)
+		if until.After(now) {
+			view.Rate7dLeft = until.Sub(now)
+		}
+	}
+	if live, ok := agents.Get(cacheDir, who.SessionID); ok {
+		if view.Context == 0 {
+			view.Context = live.Context
+		}
+		view.ContextETA = live.ContextETA()
 	}
 	if hasState {
 		view.Score = score.Of(current, tests, settings)
@@ -512,6 +553,8 @@ func quipFor(view render.View) string {
 		return fmt.Sprintf("%d migration heads. that one never fixes itself.", view.State.Migrations)
 	case view.Tests == "fail":
 		return "tests are red. i saw it."
+	case view.Context >= render.ContextFull:
+		return "context is packing. /compact before it eats the thread."
 	case view.State.Unpushed > 5:
 		return fmt.Sprintf("%d unpushed. this branch only exists on your laptop.", view.State.Unpushed)
 	case view.State.Dirty > 15:

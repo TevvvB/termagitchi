@@ -167,3 +167,21 @@ func TestModuleVersionNormalisesWhatTheGoToolRecords(t *testing.T) {
 		}
 	}
 }
+
+func TestParsePayloadReadsRateLimits(t *testing.T) {
+	body := `{"cwd":"/tmp/x","rate_limits":{"five_hour":{"used_percentage":38,"resets_at":1786734600},"seven_day":{"used_percentage":10,"resets_at":1787248800}}}`
+	payload := parsePayload(strings.NewReader(body), time.Second)
+	if payload.RateLimits.FiveHour.UsedPercentage != 38 {
+		t.Errorf("5h percent = %d", payload.RateLimits.FiveHour.UsedPercentage)
+	}
+	if payload.RateLimits.FiveHour.ResetsAt != 1786734600 {
+		t.Errorf("5h resets_at = %d", payload.RateLimits.FiveHour.ResetsAt)
+	}
+	if payload.RateLimits.SevenDay.UsedPercentage != 10 {
+		t.Errorf("7d percent = %d", payload.RateLimits.SevenDay.UsedPercentage)
+	}
+	who := payload.agent()
+	if who.Rate5h != 38 || who.Rate7d != 10 || who.Rate5hReset != 1786734600 {
+		t.Errorf("agent rate limits = %+v", who)
+	}
+}
