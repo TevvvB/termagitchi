@@ -422,3 +422,23 @@ func TestJSONIncludesRateLimitsWhenKnown(t *testing.T) {
 		t.Errorf("JSON missing 7d rate limit, got %s", out)
 	}
 }
+
+func TestJSONIncludesModelWhenKnown(t *testing.T) {
+	base := view("feat/oauth-flow", 4, false)
+	out, err := JSON(base, config.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(out, `"model"`) {
+		t.Errorf("JSON without model should omit the key, got %s", out)
+	}
+
+	base.Model = "Opus 5"
+	out, err = JSON(base, config.Default())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, `"model":"Opus 5"`) {
+		t.Errorf("JSON missing model, got %s", out)
+	}
+}

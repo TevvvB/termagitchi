@@ -287,6 +287,9 @@ func JSON(v View, settings config.Config) (string, error) {
 	if len(v.State.External) > 0 {
 		payload["external"] = v.State.External
 	}
+	if v.Model != "" {
+		payload["model"] = v.Model
+	}
 	if v.Context > 0 {
 		payload["context"] = v.Context
 	}

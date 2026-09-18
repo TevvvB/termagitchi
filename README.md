@@ -186,6 +186,8 @@ The optional context `~Nm` is estimated from how fast that agent's fill has been
 so you know when to `/compact`; the optional rate-limit `~Nh` comes from the harness's
 `resets_at` so you know when the quota window refreshes.
 Stop also nudges `/compact` when burn-rate ETA is ≤15m, not only at 80% fill.
+When a 5h or 7d rate-limit fill hits 80%, Stop warns about the quota the same way
+(after context), so a nearly-spent window is as visible as a packing thread.
 
 ## Seeing every worktree at once
 

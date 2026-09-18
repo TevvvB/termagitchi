@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -134,18 +135,20 @@ type hookPayload struct {
 	} `json:"model"`
 	// The only genuinely per-agent signal here: mood comes from the worktree and is shared.
 	ContextWindow struct {
-		UsedPercentage int `json:"used_percentage"`
+		// UsedPercentage is often a float in Claude Code statusline JSON (e.g. 23.5);
+		// agent() rounds it to a whole percent for the statusline.
+		UsedPercentage float64 `json:"used_percentage"`
 	} `json:"context_window"`
 	// RateLimits are Claude Code subscription quotas. Absent on Codex and on
 	// surfaces that never pipe statusline JSON.
 	RateLimits struct {
 		FiveHour struct {
-			UsedPercentage int   `json:"used_percentage"`
-			ResetsAt       int64 `json:"resets_at"`
+			UsedPercentage float64 `json:"used_percentage"`
+			ResetsAt       int64   `json:"resets_at"`
 		} `json:"five_hour"`
 		SevenDay struct {
-			UsedPercentage int   `json:"used_percentage"`
-			ResetsAt       int64 `json:"resets_at"`
+			UsedPercentage float64 `json:"used_percentage"`
+			ResetsAt       int64   `json:"resets_at"`
 		} `json:"seven_day"`
 	} `json:"rate_limits"`
 	ToolInput struct {
@@ -177,12 +180,21 @@ func (p hookPayload) agent() agent {
 		Repo:        p.Workspace.Repo.Name,
 		Worktree:    p.Workspace.GitWorktree,
 		Model:       p.Model.DisplayName,
-		Context:     p.ContextWindow.UsedPercentage,
-		Rate5h:      p.RateLimits.FiveHour.UsedPercentage,
+		Context:     wholePercent(p.ContextWindow.UsedPercentage),
+		Rate5h:      wholePercent(p.RateLimits.FiveHour.UsedPercentage),
 		Rate5hReset: p.RateLimits.FiveHour.ResetsAt,
-		Rate7d:      p.RateLimits.SevenDay.UsedPercentage,
+		Rate7d:      wholePercent(p.RateLimits.SevenDay.UsedPercentage),
 		Rate7dReset: p.RateLimits.SevenDay.ResetsAt,
 	}
+}
+
+// wholePercent turns a harness fill into a display percent. Claude Code docs
+// send used_percentage as a float; int fields would silently drop those values.
+func wholePercent(v float64) int {
+	if v <= 0 {
+		return 0
+	}
+	return int(math.Round(v))
 }
 
 // stdinDeadline bounds how long a surface may take to hand over its payload.
@@ -555,6 +567,8 @@ func quipFor(view render.View) string {
 		return "tests are red. i saw it."
 	case view.Context >= render.ContextFull || (view.ContextETA > 0 && view.ContextETA <= render.ContextETACompact):
 		return "context is packing. /compact before it eats the thread."
+	case view.Rate5h >= render.ContextFull || view.Rate7d >= render.ContextFull:
+		return "rate limit is packing. ease up before the window resets."
 	case view.State.Unpushed > 5:
 		return fmt.Sprintf("%d unpushed. this branch only exists on your laptop.", view.State.Unpushed)
 	case view.State.Dirty > 15:
