@@ -53,6 +53,11 @@ type Record struct {
 	Since time.Time
 	// Context is the context window's fill percentage; zero means unknown, since only the status line reports it.
 	Context int
+	// ContextAt is when Context last changed to a new non-zero value.
+	ContextAt time.Time
+	// PrevContext and PrevContextAt are the prior sample, used to estimate time-to-full.
+	PrevContext   int
+	PrevContextAt time.Time
 }
 
 func (r Record) Stale(now time.Time) bool { return now.Sub(r.Seen) >= StaleAfter }
@@ -73,6 +78,51 @@ func (r Record) Label() string {
 		return r.Session[:8]
 	}
 	return r.Session
+}
+
+// ContextETA estimates time until the window is full from the last two samples.
+//
+// Returns 0 when burn rate is unknown, flat, or negative (a compact), or when the
+// estimate would be too noisy or too far out to be useful on a status line.
+func (r Record) ContextETA() time.Duration {
+	if r.Context <= 0 || r.Context >= 100 {
+		return 0
+	}
+	if r.PrevContext <= 0 || r.ContextAt.IsZero() || r.PrevContextAt.IsZero() {
+		return 0
+	}
+	if r.Context <= r.PrevContext {
+		return 0
+	}
+	elapsed := r.ContextAt.Sub(r.PrevContextAt)
+	if elapsed < 30*time.Second {
+		return 0
+	}
+	rate := float64(r.Context-r.PrevContext) / elapsed.Seconds()
+	if rate <= 0 {
+		return 0
+	}
+	secs := float64(100-r.Context) / rate
+	eta := time.Duration(secs * float64(time.Second))
+	if eta < time.Minute {
+		return time.Minute
+	}
+	if eta > 3*time.Hour {
+		return 0
+	}
+	return eta.Round(time.Minute)
+}
+
+// Get loads one agent by session. Missing files are a miss, never an error callers must handle.
+func Get(stateDir, session string) (Record, bool) {
+	if session == "" {
+		return Record{}, false
+	}
+	record, err := read(filepath.Join(dir(stateDir), fileName(session)))
+	if err != nil {
+		return Record{}, false
+	}
+	return record, true
 }
 
 func dir(stateDir string) string { return filepath.Join(stateDir, "agents") }
@@ -101,37 +151,73 @@ func Touch(stateDir string, record Record, now time.Time) error {
 	}
 	path := filepath.Join(dir(stateDir), fileName(record.Session))
 	record.Since = now
+	contextChanged := false
 	if existing, err := read(path); err == nil {
 		// A hook carries no context window, and must not reset what the status line knew.
 		if record.Context == 0 {
 			record.Context = existing.Context
+			record.ContextAt = existing.ContextAt
+			record.PrevContext = existing.PrevContext
+			record.PrevContextAt = existing.PrevContextAt
+		} else if record.Context != existing.Context {
+			// A new fill percentage is worth writing even inside the heartbeat window:
+			// otherwise the burn-rate sample that feeds ContextETA never lands.
+			contextChanged = true
+			if existing.Context > 0 {
+				record.PrevContext = existing.Context
+				if !existing.ContextAt.IsZero() {
+					record.PrevContextAt = existing.ContextAt
+				} else {
+					record.PrevContextAt = existing.Seen
+				}
+			} else {
+				record.PrevContext = existing.PrevContext
+				record.PrevContextAt = existing.PrevContextAt
+			}
+			record.ContextAt = now
+		} else {
+			record.ContextAt = existing.ContextAt
+			record.PrevContext = existing.PrevContext
+			record.PrevContextAt = existing.PrevContextAt
+			if record.ContextAt.IsZero() {
+				record.ContextAt = now
+			}
 		}
 		if existing.Den == record.Den {
 			// Same den, so the arrival time carries over rather than being reset
 			// by every heartbeat.
 			record.Since = existing.Since
-			if now.Sub(existing.Seen) < Heartbeat {
+			if !contextChanged && now.Sub(existing.Seen) < Heartbeat {
 				return nil
 			}
 		}
 		// A changed den is written immediately whatever the heartbeat says: the
 		// move is the interesting event, and delaying it loses the arrival time.
+	} else if record.Context > 0 {
+		record.ContextAt = now
 	}
 	if err := os.MkdirAll(dir(stateDir), 0o755); err != nil {
 		return err
 	}
 	record.Seen = now
 	var out strings.Builder
-	fmt.Fprintf(&out, "session=%s\nden=%s\nroot=%s\nbranch=%s\nname=%s\nts=%d\nsince=%d\ncontext=%d\n",
+	fmt.Fprintf(&out, "session=%s\nden=%s\nroot=%s\nbranch=%s\nname=%s\nts=%d\nsince=%d\ncontext=%d\ncontext_ts=%d\nprev_context=%d\nprev_context_ts=%d\n",
 		record.Session, record.Den, record.Root, record.Branch,
 		// A newline in a session name would forge a second field on read.
 		strings.ReplaceAll(record.Name, "\n", " "), record.Seen.Unix(), record.Since.Unix(),
-		record.Context)
+		record.Context, unixOrZero(record.ContextAt), record.PrevContext, unixOrZero(record.PrevContextAt))
 	temporary := path + ".tmp"
 	if err := os.WriteFile(temporary, []byte(out.String()), 0o644); err != nil {
 		return err
 	}
 	return os.Rename(temporary, path)
+}
+
+func unixOrZero(t time.Time) int64 {
+	if t.IsZero() {
+		return 0
+	}
+	return t.Unix()
 }
 
 // Beat records an agent as still alive without claiming to know where it is.
@@ -187,6 +273,28 @@ func read(path string) (Record, error) {
 				return Record{}, err
 			}
 			record.Context = percent
+		case "context_ts":
+			seconds, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
+			if err != nil {
+				return Record{}, err
+			}
+			if seconds > 0 {
+				record.ContextAt = time.Unix(seconds, 0)
+			}
+		case "prev_context":
+			percent, err := strconv.Atoi(strings.TrimSpace(value))
+			if err != nil {
+				return Record{}, err
+			}
+			record.PrevContext = percent
+		case "prev_context_ts":
+			seconds, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
+			if err != nil {
+				return Record{}, err
+			}
+			if seconds > 0 {
+				record.PrevContextAt = time.Unix(seconds, 0)
+			}
 		case "since":
 			seconds, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
 			if err != nil {

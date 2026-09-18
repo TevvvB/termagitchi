@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TevvvB/termagitchi/internal/render"
 	"github.com/TevvvB/termagitchi/internal/verdict"
 )
 
@@ -167,3 +168,80 @@ func TestModuleVersionNormalisesWhatTheGoToolRecords(t *testing.T) {
 		}
 	}
 }
+
+func TestParsePayloadReadsRateLimits(t *testing.T) {
+	body := `{"cwd":"/tmp/x","rate_limits":{"five_hour":{"used_percentage":38,"resets_at":1786734600},"seven_day":{"used_percentage":10,"resets_at":1787248800}}}`
+	payload := parsePayload(strings.NewReader(body), time.Second)
+	if payload.RateLimits.FiveHour.UsedPercentage != 38 {
+		t.Errorf("5h percent = %v", payload.RateLimits.FiveHour.UsedPercentage)
+	}
+	if payload.RateLimits.FiveHour.ResetsAt != 1786734600 {
+		t.Errorf("5h resets_at = %d", payload.RateLimits.FiveHour.ResetsAt)
+	}
+	if payload.RateLimits.SevenDay.UsedPercentage != 10 {
+		t.Errorf("7d percent = %v", payload.RateLimits.SevenDay.UsedPercentage)
+	}
+	who := payload.agent()
+	if who.Rate5h != 38 || who.Rate7d != 10 || who.Rate5hReset != 1786734600 {
+		t.Errorf("agent rate limits = %+v", who)
+	}
+}
+
+func TestQuipForCompactsOnNearETA(t *testing.T) {
+	want := "context is packing. /compact before it eats the thread."
+
+	// ETA ≤15m with fill still under 80% should nudge /compact.
+	if got := quipFor(render.View{Context: 50, ContextETA: 10 * time.Minute}); got != want {
+		t.Errorf("ETA≤15m fill<80%% = %q, want compact quip", got)
+	}
+	// Exact threshold counts.
+	if got := quipFor(render.View{Context: 50, ContextETA: render.ContextETACompact}); got != want {
+		t.Errorf("ETA==15m fill<80%% = %q, want compact quip", got)
+	}
+	// Longer ETA and fill under 80% stays off the compact tier (clean default).
+	if got := quipFor(render.View{Context: 50, ContextETA: 20 * time.Minute}); got == want {
+		t.Errorf("ETA>15m fill<80%% still compact: %q", got)
+	}
+	// Fill at/above ContextFull still compact even with no ETA.
+	if got := quipFor(render.View{Context: render.ContextFull}); got != want {
+		t.Errorf("Context≥80%% = %q, want compact quip", got)
+	}
+}
+func TestParsePayloadAcceptsFloatUsedPercentage(t *testing.T) {
+	// Claude Code statusline docs send used_percentage as a float (e.g. 23.5).
+	body := `{"cwd":"/tmp/x","context_window":{"used_percentage":72.4},"rate_limits":{"five_hour":{"used_percentage":38.6,"resets_at":1786734600},"seven_day":{"used_percentage":9.4,"resets_at":1787248800}},"model":{"display_name":"Opus"}}`
+	payload := parsePayload(strings.NewReader(body), time.Second)
+	who := payload.agent()
+	if who.Context != 72 {
+		t.Errorf("context whole percent = %d, want 72", who.Context)
+	}
+	if who.Rate5h != 39 {
+		t.Errorf("5h whole percent = %d, want 39", who.Rate5h)
+	}
+	if who.Rate7d != 9 {
+		t.Errorf("7d whole percent = %d, want 9", who.Rate7d)
+	}
+	if who.Model != "Opus" {
+		t.Errorf("model = %q", who.Model)
+	}
+}
+
+func TestQuipForWarnsOnRateLimitFull(t *testing.T) {
+	want := "rate limit is packing. ease up before the window resets."
+	if got := quipFor(render.View{Rate5h: render.ContextFull}); got != want {
+		t.Errorf("5h≥80%% = %q, want rate-limit quip", got)
+	}
+	if got := quipFor(render.View{Rate7d: render.ContextFull}); got != want {
+		t.Errorf("7d≥80%% = %q, want rate-limit quip", got)
+	}
+	// Context packing stays above the rate-limit tier.
+	compact := "context is packing. /compact before it eats the thread."
+	if got := quipFor(render.View{Context: render.ContextFull, Rate5h: render.ContextFull}); got != compact {
+		t.Errorf("context+rate full = %q, want context compact quip", got)
+	}
+	// Under 80% stays off this tier.
+	if got := quipFor(render.View{Rate5h: 79}); got == want {
+		t.Errorf("5h 79%% still rate-limit quip: %q", got)
+	}
+}
+

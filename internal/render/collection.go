@@ -136,7 +136,7 @@ func Party(views []View, settings config.Config, showAll bool, now time.Time) st
 			fmt.Fprintf(&out, "       %s%s %s%s  %s%s%s%s%s\n",
 				tone, creature, species, reset,
 				dim, pad(truncate(resident.Label(), 36), 38), since(resident.Seen, now), note,
-				contextNote(resident.Context))
+				contextNote(resident.Context, resident.ContextETA()))
 		}
 	}
 
