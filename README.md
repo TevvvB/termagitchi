@@ -185,6 +185,7 @@ sit on the statusline (and context also on the agent's party row) rather than in
 The optional context `~Nm` is estimated from how fast that agent's fill has been climbing,
 so you know when to `/compact`; the optional rate-limit `~Nh` comes from the harness's
 `resets_at` so you know when the quota window refreshes.
+Stop also nudges `/compact` when burn-rate ETA is ≤15m, not only at 80% fill.
 
 ## Seeing every worktree at once
 

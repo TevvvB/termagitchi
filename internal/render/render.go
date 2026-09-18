@@ -332,6 +332,9 @@ func since(then, now time.Time) string {
 // ContextFull is where the figure stops being dim and starts warning: an agent near the end of its window is actionable.
 const ContextFull = 80
 
+// ContextETACompact is when Stop nudges /compact from burn-rate ETA even if fill is still under ContextFull.
+const ContextETACompact = 15 * time.Minute
+
 // contextNote renders the fill (and optional ETA), or nothing when unknown, so a
 // hook-only harness is never shown a confident 0%.
 func contextNote(percent int, eta time.Duration) string {

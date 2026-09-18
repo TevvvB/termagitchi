@@ -553,7 +553,7 @@ func quipFor(view render.View) string {
 		return fmt.Sprintf("%d migration heads. that one never fixes itself.", view.State.Migrations)
 	case view.Tests == "fail":
 		return "tests are red. i saw it."
-	case view.Context >= render.ContextFull:
+	case view.Context >= render.ContextFull || (view.ContextETA > 0 && view.ContextETA <= render.ContextETACompact):
 		return "context is packing. /compact before it eats the thread."
 	case view.State.Unpushed > 5:
 		return fmt.Sprintf("%d unpushed. this branch only exists on your laptop.", view.State.Unpushed)

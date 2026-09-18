@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/TevvvB/termagitchi/internal/render"
 	"github.com/TevvvB/termagitchi/internal/verdict"
 )
 
@@ -183,5 +184,26 @@ func TestParsePayloadReadsRateLimits(t *testing.T) {
 	who := payload.agent()
 	if who.Rate5h != 38 || who.Rate7d != 10 || who.Rate5hReset != 1786734600 {
 		t.Errorf("agent rate limits = %+v", who)
+	}
+}
+
+func TestQuipForCompactsOnNearETA(t *testing.T) {
+	want := "context is packing. /compact before it eats the thread."
+
+	// ETA ≤15m with fill still under 80% should nudge /compact.
+	if got := quipFor(render.View{Context: 50, ContextETA: 10 * time.Minute}); got != want {
+		t.Errorf("ETA≤15m fill<80%% = %q, want compact quip", got)
+	}
+	// Exact threshold counts.
+	if got := quipFor(render.View{Context: 50, ContextETA: render.ContextETACompact}); got != want {
+		t.Errorf("ETA==15m fill<80%% = %q, want compact quip", got)
+	}
+	// Longer ETA and fill under 80% stays off the compact tier (clean default).
+	if got := quipFor(render.View{Context: 50, ContextETA: 20 * time.Minute}); got == want {
+		t.Errorf("ETA>15m fill<80%% still compact: %q", got)
+	}
+	// Fill at/above ContextFull still compact even with no ETA.
+	if got := quipFor(render.View{Context: render.ContextFull}); got != want {
+		t.Errorf("Context≥80%% = %q, want compact quip", got)
 	}
 }
