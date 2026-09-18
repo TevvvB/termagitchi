@@ -131,12 +131,16 @@ common 和 uncommon 各自分到独立色调，所以同一个物种也能区分
 | Agent | 支持程度 |
 |---|---|
 | Claude Code | 完整支持：状态栏、孵化、吐槽 |
-| Codex CLI | 钩子写好了但没在真实环境验证过。宠物显示请用下面的 shell 方案 |
+| Codex CLI | 钩子可用，但必须先让 Codex 信任它们——见下文。没有状态栏，宠物显示请用下面的 shell 方案 |
 | tmux / shell 提示符 | 完整支持，**任何** agent 都能用 |
 | 编辑器 | 用 `pets render --format=json` 自己做 |
 
 tmux 和 shell 这两种方式不需要 agent 提供任何东西，所以 Aider、Amp、Gemini CLI 都能用。
 端到端验证过的只有 Claude Code。如果你用别的跑通了、或者没跑通，欢迎提 issue。
+
+**Codex 钩子必须先被信任才会运行。** 这点很关键，但没人会提醒你：Codex 在你接受之前不会执行新的或已更改的钩子，未信任的钩子完全静默，而且 `codex doctor` 根本不提钩子。所以刚跑完 `pets install --harness=codex` 看起来像成功了，但在下次会话开始时点同意之前什么都不会发生。已在 Codex 0.149.0 上验证——同一套配置只有在带 `--dangerously-bypass-hook-trust` 运行时才会触发。
+
+信任之后就能用：Codex 的 payload 带有 `session_id`，这正是生物的键，所以 agent 会注册，`pets den` 和 `pets party` 会像 Claude Code 下一样填满。Codex payload 里没有 `workspace` 对象，因此窝的名字来自 git。
 
 ## 许可证
 
