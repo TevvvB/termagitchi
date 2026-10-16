@@ -244,4 +244,3 @@ func TestQuipForWarnsOnRateLimitFull(t *testing.T) {
 		t.Errorf("5h 79%% still rate-limit quip: %q", got)
 	}
 }
-
