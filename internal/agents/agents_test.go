@@ -169,3 +169,57 @@ func TestTouchKeepsAKnownContextWhenAHookReportsNone(t *testing.T) {
 		t.Errorf("context is %d after a hook reported none, want 72 preserved", live[0].Context)
 	}
 }
+
+func TestContextETAFromBurnRate(t *testing.T) {
+	dir := t.TempDir()
+	now := time.Date(2026, 9, 8, 12, 0, 0, 0, time.UTC)
+	if err := Touch(dir, Record{Session: "eta-session", Den: "place:one#one", Context: 40}, now); err != nil {
+		t.Fatal(err)
+	}
+	later := now.Add(2 * time.Minute)
+	if err := Touch(dir, Record{Session: "eta-session", Den: "place:one#one", Context: 60}, later); err != nil {
+		t.Fatal(err)
+	}
+	live, ok := Get(dir, "eta-session")
+	if !ok {
+		t.Fatal("missing agent after context samples")
+	}
+	if live.PrevContext != 40 || live.Context != 60 {
+		t.Fatalf("samples are prev=%d cur=%d, want 40 then 60", live.PrevContext, live.Context)
+	}
+	// 20% in 2 minutes => 10%/min => 40% remaining => ~4m
+	eta := live.ContextETA()
+	if eta != 4*time.Minute {
+		t.Fatalf("ContextETA is %v, want 4m", eta)
+	}
+}
+
+func TestTouchWritesChangedContextInsideHeartbeat(t *testing.T) {
+	dir := t.TempDir()
+	now := time.Date(2026, 9, 8, 12, 0, 0, 0, time.UTC)
+	if err := Touch(dir, Record{Session: "hb-session", Den: "place:one#one", Context: 10}, now); err != nil {
+		t.Fatal(err)
+	}
+	// Well inside Heartbeat (10s).
+	soon := now.Add(2 * time.Second)
+	if err := Touch(dir, Record{Session: "hb-session", Den: "place:one#one", Context: 25}, soon); err != nil {
+		t.Fatal(err)
+	}
+	live, ok := Get(dir, "hb-session")
+	if !ok {
+		t.Fatal("missing agent")
+	}
+	if live.Context != 25 {
+		t.Fatalf("context inside heartbeat stayed %d, want 25", live.Context)
+	}
+	if live.PrevContext != 10 {
+		t.Fatalf("prev context is %d, want 10", live.PrevContext)
+	}
+}
+
+func TestContextETAUnknownWithoutHistory(t *testing.T) {
+	r := Record{Context: 70}
+	if r.ContextETA() != 0 {
+		t.Fatalf("single sample should not invent an ETA, got %v", r.ContextETA())
+	}
+}
